@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  HomeView.swift
 //  PlantCheck
 //
 //  Created by Maksim Savvin on 29.04.2022.
@@ -8,22 +8,21 @@
 import SwiftUI
 import CoreData
 
-struct ContentView: View {
+struct HomeView: View {
     @Environment(\.managedObjectContext) private var viewContext
 
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Plant.name, ascending: true)],
         animation: .default)
-    private var items: FetchedResults<Item>
+    private var plants: FetchedResults<Plant>
 
     var body: some View {
         NavigationView {
             List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp!, formatter: itemFormatter)")
-                    } label: {
-                        Text(item.timestamp!, formatter: itemFormatter)
+                ForEach(plants) { plant in
+                    VStack{
+                        Text(plant.name!)
+                        Text(plant.creationDate!.formatted())
                     }
                 }
                 .onDelete(perform: deleteItems)
@@ -33,8 +32,10 @@ struct ContentView: View {
                     EditButton()
                 }
                 ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                    Button(action: {}){
+                        NavigationLink(destination: AddPlantView()){
+                            Image(systemName: "plus")
+                        }
                     }
                 }
             }
@@ -44,9 +45,9 @@ struct ContentView: View {
 
     private func addItem() {
         withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-
+            let newPlant = Plant(context: viewContext)
+            newPlant.name = "Test"
+            newPlant.creationDate = Date()
             do {
                 try viewContext.save()
             } catch {
@@ -60,7 +61,7 @@ struct ContentView: View {
 
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
+            offsets.map { plants[$0] }.forEach(viewContext.delete)
 
             do {
                 try viewContext.save()
@@ -83,6 +84,6 @@ private let itemFormatter: DateFormatter = {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        HomeView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }

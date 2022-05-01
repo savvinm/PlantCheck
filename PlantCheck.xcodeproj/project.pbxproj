@@ -8,21 +8,23 @@
 
 /* Begin PBXBuildFile section */
 		B54C2338281C059300DDA412 /* PlantCheckApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54C2337281C059300DDA412 /* PlantCheckApp.swift */; };
-		B54C233A281C059300DDA412 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54C2339281C059300DDA412 /* ContentView.swift */; };
+		B54C233A281C059300DDA412 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54C2339281C059300DDA412 /* HomeView.swift */; };
 		B54C233C281C059500DDA412 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B54C233B281C059500DDA412 /* Assets.xcassets */; };
 		B54C233F281C059500DDA412 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B54C233E281C059500DDA412 /* Preview Assets.xcassets */; };
 		B54C2341281C059500DDA412 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54C2340281C059500DDA412 /* Persistence.swift */; };
 		B54C2344281C059500DDA412 /* PlantCheck.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B54C2342281C059500DDA412 /* PlantCheck.xcdatamodeld */; };
+		B576C2DE281EFE8000A05A5A /* AddPlantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B576C2DD281EFE8000A05A5A /* AddPlantView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		B54C2334281C059300DDA412 /* PlantCheck.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlantCheck.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B54C2337281C059300DDA412 /* PlantCheckApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantCheckApp.swift; sourceTree = "<group>"; };
-		B54C2339281C059300DDA412 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		B54C2339281C059300DDA412 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		B54C233B281C059500DDA412 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B54C233E281C059500DDA412 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		B54C2340281C059500DDA412 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		B54C2343281C059500DDA412 /* PlantCheck.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PlantCheck.xcdatamodel; sourceTree = "<group>"; };
+		B576C2DD281EFE8000A05A5A /* AddPlantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPlantView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,11 +58,12 @@
 			isa = PBXGroup;
 			children = (
 				B54C2337281C059300DDA412 /* PlantCheckApp.swift */,
-				B54C2339281C059300DDA412 /* ContentView.swift */,
+				B54C2339281C059300DDA412 /* HomeView.swift */,
 				B54C233B281C059500DDA412 /* Assets.xcassets */,
 				B54C2340281C059500DDA412 /* Persistence.swift */,
 				B54C2342281C059500DDA412 /* PlantCheck.xcdatamodeld */,
 				B54C233D281C059500DDA412 /* Preview Content */,
+				B576C2DD281EFE8000A05A5A /* AddPlantView.swift */,
 			);
 			path = PlantCheck;
 			sourceTree = "<group>";
@@ -145,8 +148,9 @@
 			files = (
 				B54C2344281C059500DDA412 /* PlantCheck.xcdatamodeld in Sources */,
 				B54C2341281C059500DDA412 /* Persistence.swift in Sources */,
-				B54C233A281C059300DDA412 /* ContentView.swift in Sources */,
+				B54C233A281C059300DDA412 /* HomeView.swift in Sources */,
 				B54C2338281C059300DDA412 /* PlantCheckApp.swift in Sources */,
+				B576C2DE281EFE8000A05A5A /* AddPlantView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,6 +287,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -312,6 +317,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
