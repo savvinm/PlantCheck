@@ -14,6 +14,7 @@
 		B54C2341281C059500DDA412 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54C2340281C059500DDA412 /* Persistence.swift */; };
 		B54C2344281C059500DDA412 /* PlantCheck.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B54C2342281C059500DDA412 /* PlantCheck.xcdatamodeld */; };
 		B576C2DE281EFE8000A05A5A /* AddPlantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B576C2DD281EFE8000A05A5A /* AddPlantView.swift */; };
+		B576C2E0281F2D0100A05A5A /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B576C2DF281F2D0100A05A5A /* ImagePicker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +26,7 @@
 		B54C2340281C059500DDA412 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		B54C2343281C059500DDA412 /* PlantCheck.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PlantCheck.xcdatamodel; sourceTree = "<group>"; };
 		B576C2DD281EFE8000A05A5A /* AddPlantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPlantView.swift; sourceTree = "<group>"; };
+		B576C2DF281F2D0100A05A5A /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +66,7 @@
 				B54C2342281C059500DDA412 /* PlantCheck.xcdatamodeld */,
 				B54C233D281C059500DDA412 /* Preview Content */,
 				B576C2DD281EFE8000A05A5A /* AddPlantView.swift */,
+				B576C2DF281F2D0100A05A5A /* ImagePicker.swift */,
 			);
 			path = PlantCheck;
 			sourceTree = "<group>";
@@ -149,6 +152,7 @@
 				B54C2344281C059500DDA412 /* PlantCheck.xcdatamodeld in Sources */,
 				B54C2341281C059500DDA412 /* Persistence.swift in Sources */,
 				B54C233A281C059300DDA412 /* HomeView.swift in Sources */,
+				B576C2E0281F2D0100A05A5A /* ImagePicker.swift in Sources */,
 				B54C2338281C059300DDA412 /* PlantCheckApp.swift in Sources */,
 				B576C2DE281EFE8000A05A5A /* AddPlantView.swift in Sources */,
 			);

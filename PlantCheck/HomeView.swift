@@ -16,6 +16,7 @@ struct HomeView: View {
         animation: .default)
     private var plants: FetchedResults<Plant>
 
+    
     var body: some View {
         NavigationView {
             List {
@@ -23,6 +24,7 @@ struct HomeView: View {
                     VStack{
                         Text(plant.name!)
                         Text(plant.creationDate!.formatted())
+                        Text(plant.nextWatering!.formatted())
                     }
                 }
                 .onDelete(perform: deleteItems)
