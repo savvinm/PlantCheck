@@ -49,7 +49,10 @@ struct ImagePicker: UIViewControllerRepresentable {
                             print(error)
                             return
                         }
-                        self.parent.images.append(image as! UIImage)
+                        DispatchQueue.main.async {
+                            [ weak self ] in
+                            self?.parent.images.append(image as! UIImage)
+                        }
                     }
                 }
             }

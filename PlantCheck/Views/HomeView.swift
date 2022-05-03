@@ -15,7 +15,6 @@ struct HomeView: View {
         sortDescriptors: [NSSortDescriptor(keyPath: \Plant.name, ascending: true)],
         animation: .default)
     private var plants: FetchedResults<Plant>
-
     
     var body: some View {
         NavigationView {

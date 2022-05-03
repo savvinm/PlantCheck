@@ -13,6 +13,11 @@
 		B54C233F281C059500DDA412 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B54C233E281C059500DDA412 /* Preview Assets.xcassets */; };
 		B54C2341281C059500DDA412 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54C2340281C059500DDA412 /* Persistence.swift */; };
 		B54C2344281C059500DDA412 /* PlantCheck.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B54C2342281C059500DDA412 /* PlantCheck.xcdatamodeld */; };
+		B56E70AE282153DD007A2626 /* PlantAddingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56E70AD282153DD007A2626 /* PlantAddingViewModel.swift */; };
+		B56E70B028216AAA007A2626 /* WikiPageRevisionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56E70AF28216AAA007A2626 /* WikiPageRevisionModel.swift */; };
+		B56E70B228217F56007A2626 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56E70B128217F56007A2626 /* APIService.swift */; };
+		B56E70B528218CCC007A2626 /* WikiParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56E70B428218CCC007A2626 /* WikiParser.swift */; };
+		B56E70B72821B5A1007A2626 /* WikiThumbnailModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56E70B62821B5A1007A2626 /* WikiThumbnailModel.swift */; };
 		B576C2DE281EFE8000A05A5A /* AddPlantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B576C2DD281EFE8000A05A5A /* AddPlantView.swift */; };
 		B576C2E0281F2D0100A05A5A /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B576C2DF281F2D0100A05A5A /* ImagePicker.swift */; };
 /* End PBXBuildFile section */
@@ -25,6 +30,11 @@
 		B54C233E281C059500DDA412 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		B54C2340281C059500DDA412 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		B54C2343281C059500DDA412 /* PlantCheck.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PlantCheck.xcdatamodel; sourceTree = "<group>"; };
+		B56E70AD282153DD007A2626 /* PlantAddingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantAddingViewModel.swift; sourceTree = "<group>"; };
+		B56E70AF28216AAA007A2626 /* WikiPageRevisionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiPageRevisionModel.swift; sourceTree = "<group>"; };
+		B56E70B128217F56007A2626 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
+		B56E70B428218CCC007A2626 /* WikiParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiParser.swift; sourceTree = "<group>"; };
+		B56E70B62821B5A1007A2626 /* WikiThumbnailModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiThumbnailModel.swift; sourceTree = "<group>"; };
 		B576C2DD281EFE8000A05A5A /* AddPlantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPlantView.swift; sourceTree = "<group>"; };
 		B576C2DF281F2D0100A05A5A /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -59,14 +69,15 @@
 		B54C2336281C059300DDA412 /* PlantCheck */ = {
 			isa = PBXGroup;
 			children = (
-				B54C2337281C059300DDA412 /* PlantCheckApp.swift */,
-				B54C2339281C059300DDA412 /* HomeView.swift */,
 				B54C233B281C059500DDA412 /* Assets.xcassets */,
 				B54C2340281C059500DDA412 /* Persistence.swift */,
+				B56E70AD282153DD007A2626 /* PlantAddingViewModel.swift */,
 				B54C2342281C059500DDA412 /* PlantCheck.xcdatamodeld */,
+				B54C2337281C059300DDA412 /* PlantCheckApp.swift */,
 				B54C233D281C059500DDA412 /* Preview Content */,
-				B576C2DD281EFE8000A05A5A /* AddPlantView.swift */,
-				B576C2DF281F2D0100A05A5A /* ImagePicker.swift */,
+				B56E70BB2821E0BA007A2626 /* Services */,
+				B56E70BA2821E09F007A2626 /* Views */,
+				B56E70B328218C9E007A2626 /* WikiAPI */,
 			);
 			path = PlantCheck;
 			sourceTree = "<group>";
@@ -77,6 +88,34 @@
 				B54C233E281C059500DDA412 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		B56E70B328218C9E007A2626 /* WikiAPI */ = {
+			isa = PBXGroup;
+			children = (
+				B56E70AF28216AAA007A2626 /* WikiPageRevisionModel.swift */,
+				B56E70B428218CCC007A2626 /* WikiParser.swift */,
+				B56E70B62821B5A1007A2626 /* WikiThumbnailModel.swift */,
+			);
+			path = WikiAPI;
+			sourceTree = "<group>";
+		};
+		B56E70BA2821E09F007A2626 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B54C2339281C059300DDA412 /* HomeView.swift */,
+				B576C2DD281EFE8000A05A5A /* AddPlantView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		B56E70BB2821E0BA007A2626 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				B56E70B128217F56007A2626 /* APIService.swift */,
+				B576C2DF281F2D0100A05A5A /* ImagePicker.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -149,12 +188,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B56E70B528218CCC007A2626 /* WikiParser.swift in Sources */,
 				B54C2344281C059500DDA412 /* PlantCheck.xcdatamodeld in Sources */,
 				B54C2341281C059500DDA412 /* Persistence.swift in Sources */,
 				B54C233A281C059300DDA412 /* HomeView.swift in Sources */,
+				B56E70AE282153DD007A2626 /* PlantAddingViewModel.swift in Sources */,
 				B576C2E0281F2D0100A05A5A /* ImagePicker.swift in Sources */,
 				B54C2338281C059300DDA412 /* PlantCheckApp.swift in Sources */,
+				B56E70B72821B5A1007A2626 /* WikiThumbnailModel.swift in Sources */,
 				B576C2DE281EFE8000A05A5A /* AddPlantView.swift in Sources */,
+				B56E70B228217F56007A2626 /* APIService.swift in Sources */,
+				B56E70B028216AAA007A2626 /* WikiPageRevisionModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
