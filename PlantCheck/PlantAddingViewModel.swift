@@ -12,18 +12,36 @@ import SwiftUI
 class PlantAddingViewModel: ObservableObject{
     
     private var genuses: [String]
-    var options: [String]
-    var thumbnails: [String: URL]
+    private(set) var options: [String]
+    private(set) var thumbnails: [String: URL]
     
     @Published var showingImagePicker = false
-    @Published var images: [UIImage] = []
+    
+    var imageCount: Int = 0{
+        didSet{
+            DispatchQueue.main.async {
+                [ weak self ] in
+                self?.objectWillChange.send()
+            }
+        }
+    }
+    
+    var images: [UIImage] = []{
+        didSet{
+            DispatchQueue.main.async {
+                [ weak self ] in
+                self?.objectWillChange.send()
+            }
+        }
+    }
     var genus = "" {
         didSet{
             updateOptions()
         }
     }
-    var name = ""
-    var location = ""
+    
+    @Published var name = ""
+    @Published var location = ""
     var wateringInterval = 1
     @Published var genusIsFocused = false
 
@@ -46,13 +64,11 @@ class PlantAddingViewModel: ObservableObject{
         }
     }
     
-    func sendIvent(){
-        objectWillChange.send()
-    }
     
     func removeImage(_ image: UIImage){
         if let index = images.firstIndex(of: image){
             images.remove(at: index)
+            imageCount -= 1
         }
     }
     

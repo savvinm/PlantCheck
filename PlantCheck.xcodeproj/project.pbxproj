@@ -13,6 +13,8 @@
 		B54C233F281C059500DDA412 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B54C233E281C059500DDA412 /* Preview Assets.xcassets */; };
 		B54C2341281C059500DDA412 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54C2340281C059500DDA412 /* Persistence.swift */; };
 		B54C2344281C059500DDA412 /* PlantCheck.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B54C2342281C059500DDA412 /* PlantCheck.xcdatamodeld */; };
+		B54C322E2822694B00D58A27 /* ImagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54C322D2822694B00D58A27 /* ImagePickerView.swift */; };
+		B54C3231282332FD00D58A27 /* OptionsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54C3230282332FC00D58A27 /* OptionsList.swift */; };
 		B56E70AE282153DD007A2626 /* PlantAddingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56E70AD282153DD007A2626 /* PlantAddingViewModel.swift */; };
 		B56E70B028216AAA007A2626 /* WikiPageRevisionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56E70AF28216AAA007A2626 /* WikiPageRevisionModel.swift */; };
 		B56E70B228217F56007A2626 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56E70B128217F56007A2626 /* APIService.swift */; };
@@ -30,6 +32,8 @@
 		B54C233E281C059500DDA412 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		B54C2340281C059500DDA412 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		B54C2343281C059500DDA412 /* PlantCheck.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PlantCheck.xcdatamodel; sourceTree = "<group>"; };
+		B54C322D2822694B00D58A27 /* ImagePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerView.swift; sourceTree = "<group>"; };
+		B54C3230282332FC00D58A27 /* OptionsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsList.swift; sourceTree = "<group>"; };
 		B56E70AD282153DD007A2626 /* PlantAddingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantAddingViewModel.swift; sourceTree = "<group>"; };
 		B56E70AF28216AAA007A2626 /* WikiPageRevisionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiPageRevisionModel.swift; sourceTree = "<group>"; };
 		B56E70B128217F56007A2626 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
@@ -105,6 +109,8 @@
 			children = (
 				B54C2339281C059300DDA412 /* HomeView.swift */,
 				B576C2DD281EFE8000A05A5A /* AddPlantView.swift */,
+				B54C322D2822694B00D58A27 /* ImagePickerView.swift */,
+				B54C3230282332FC00D58A27 /* OptionsList.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -192,9 +198,11 @@
 				B54C2344281C059500DDA412 /* PlantCheck.xcdatamodeld in Sources */,
 				B54C2341281C059500DDA412 /* Persistence.swift in Sources */,
 				B54C233A281C059300DDA412 /* HomeView.swift in Sources */,
+				B54C322E2822694B00D58A27 /* ImagePickerView.swift in Sources */,
 				B56E70AE282153DD007A2626 /* PlantAddingViewModel.swift in Sources */,
 				B576C2E0281F2D0100A05A5A /* ImagePicker.swift in Sources */,
 				B54C2338281C059300DDA412 /* PlantCheckApp.swift in Sources */,
+				B54C3231282332FD00D58A27 /* OptionsList.swift in Sources */,
 				B56E70B72821B5A1007A2626 /* WikiThumbnailModel.swift in Sources */,
 				B576C2DE281EFE8000A05A5A /* AddPlantView.swift in Sources */,
 				B56E70B228217F56007A2626 /* APIService.swift in Sources */,
@@ -330,11 +338,13 @@
 				DEVELOPMENT_TEAM = M83J465D86;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PlantCheck/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -360,11 +370,13 @@
 				DEVELOPMENT_TEAM = M83J465D86;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PlantCheck/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

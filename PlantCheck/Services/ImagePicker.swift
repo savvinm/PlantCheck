@@ -11,6 +11,7 @@ import SwiftUI
 
 struct ImagePicker: UIViewControllerRepresentable {
     @Binding var images: [UIImage]
+    @Binding var imageCount: Int
 
     func makeUIViewController(context: Context) -> PHPickerViewController {
         var config = PHPickerConfiguration(photoLibrary: .shared())
@@ -40,18 +41,16 @@ struct ImagePicker: UIViewControllerRepresentable {
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
             picker.dismiss(animated: true)
             if !results.isEmpty{
+                self.parent.imageCount = results.count
                 self.parent.images = []
-            }
-            for result in results{
-                if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
-                    result.itemProvider.loadObject(ofClass: UIImage.self) { image, error in
-                        guard let image = image else{
-                            print(error)
-                            return
-                        }
-                        DispatchQueue.main.async {
-                            [ weak self ] in
-                            self?.parent.images.append(image as! UIImage)
+                for result in results{
+                    if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
+                        result.itemProvider.loadObject(ofClass: UIImage.self) { image, error in
+                            guard let image = image else{
+                                print(error!)
+                                return
+                            }
+                            self.parent.images.append(image as! UIImage)
                         }
                     }
                 }

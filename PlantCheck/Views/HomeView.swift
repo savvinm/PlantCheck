@@ -15,9 +15,10 @@ struct HomeView: View {
         sortDescriptors: [NSSortDescriptor(keyPath: \Plant.name, ascending: true)],
         animation: .default)
     private var plants: FetchedResults<Plant>
+    @State var isAddingSheetPresented = false
     
     var body: some View {
-        NavigationView {
+        NavigationView{
             List {
                 ForEach(plants) { plant in
                     VStack{
@@ -33,30 +34,12 @@ struct HomeView: View {
                     EditButton()
                 }
                 ToolbarItem {
-                    Button(action: {}){
-                        NavigationLink(destination: AddPlantView()){
-                            Image(systemName: "plus")
-                        }
+                    Button(action: { isAddingSheetPresented = true}){
+                        Image(systemName: "plus")
                     }
                 }
             }
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newPlant = Plant(context: viewContext)
-            newPlant.name = "Test"
-            newPlant.creationDate = Date()
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
+            .sheet(isPresented: $isAddingSheetPresented, content: { AddPlantView() })
         }
     }
 
