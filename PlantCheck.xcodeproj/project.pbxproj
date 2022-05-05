@@ -19,7 +19,7 @@
 		B56E70B028216AAA007A2626 /* WikiPageRevisionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56E70AF28216AAA007A2626 /* WikiPageRevisionModel.swift */; };
 		B56E70B228217F56007A2626 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56E70B128217F56007A2626 /* APIService.swift */; };
 		B56E70B528218CCC007A2626 /* WikiParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56E70B428218CCC007A2626 /* WikiParser.swift */; };
-		B56E70B72821B5A1007A2626 /* WikiThumbnailModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56E70B62821B5A1007A2626 /* WikiThumbnailModel.swift */; };
+		B56E70B72821B5A1007A2626 /* WikiImageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56E70B62821B5A1007A2626 /* WikiImageModel.swift */; };
 		B576C2DE281EFE8000A05A5A /* AddPlantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B576C2DD281EFE8000A05A5A /* AddPlantView.swift */; };
 		B576C2E0281F2D0100A05A5A /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B576C2DF281F2D0100A05A5A /* ImagePicker.swift */; };
 /* End PBXBuildFile section */
@@ -38,7 +38,7 @@
 		B56E70AF28216AAA007A2626 /* WikiPageRevisionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiPageRevisionModel.swift; sourceTree = "<group>"; };
 		B56E70B128217F56007A2626 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
 		B56E70B428218CCC007A2626 /* WikiParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiParser.swift; sourceTree = "<group>"; };
-		B56E70B62821B5A1007A2626 /* WikiThumbnailModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiThumbnailModel.swift; sourceTree = "<group>"; };
+		B56E70B62821B5A1007A2626 /* WikiImageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiImageModel.swift; sourceTree = "<group>"; };
 		B576C2DD281EFE8000A05A5A /* AddPlantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPlantView.swift; sourceTree = "<group>"; };
 		B576C2DF281F2D0100A05A5A /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -97,9 +97,9 @@
 		B56E70B328218C9E007A2626 /* WikiAPI */ = {
 			isa = PBXGroup;
 			children = (
+				B56E70B62821B5A1007A2626 /* WikiImageModel.swift */,
 				B56E70AF28216AAA007A2626 /* WikiPageRevisionModel.swift */,
 				B56E70B428218CCC007A2626 /* WikiParser.swift */,
-				B56E70B62821B5A1007A2626 /* WikiThumbnailModel.swift */,
 			);
 			path = WikiAPI;
 			sourceTree = "<group>";
@@ -107,8 +107,8 @@
 		B56E70BA2821E09F007A2626 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				B54C2339281C059300DDA412 /* HomeView.swift */,
 				B576C2DD281EFE8000A05A5A /* AddPlantView.swift */,
+				B54C2339281C059300DDA412 /* HomeView.swift */,
 				B54C322D2822694B00D58A27 /* ImagePickerView.swift */,
 				B54C3230282332FC00D58A27 /* OptionsList.swift */,
 			);
@@ -203,7 +203,7 @@
 				B576C2E0281F2D0100A05A5A /* ImagePicker.swift in Sources */,
 				B54C2338281C059300DDA412 /* PlantCheckApp.swift in Sources */,
 				B54C3231282332FD00D58A27 /* OptionsList.swift in Sources */,
-				B56E70B72821B5A1007A2626 /* WikiThumbnailModel.swift in Sources */,
+				B56E70B72821B5A1007A2626 /* WikiImageModel.swift in Sources */,
 				B576C2DE281EFE8000A05A5A /* AddPlantView.swift in Sources */,
 				B56E70B228217F56007A2626 /* APIService.swift in Sources */,
 				B56E70B028216AAA007A2626 /* WikiPageRevisionModel.swift in Sources */,

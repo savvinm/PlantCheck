@@ -13,9 +13,15 @@ struct ImagePikcerView: View{
     var body: some View{
         VStack{
             if vm.images.isEmpty{
-                VStack{
-                    defaultImage
-                    Text("1 of 1").opacity(0).font(.footnote)
+                if vm.imageURL == nil{
+                    ZStack{
+                        defaultImage
+                        photoIcon
+                    }
+                    .padding(.bottom)
+                }
+                else {
+                    wikiImage.padding(.bottom)
                 }
             }
             else{
@@ -55,7 +61,7 @@ struct ImagePikcerView: View{
             Image(uiImage: img)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(width: UIScreen.main.bounds.width, height: 250)
+                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.35)
                 .clipped()
             HStack{
                 Spacer()
@@ -66,7 +72,7 @@ struct ImagePikcerView: View{
                             vm.removeImage(img)
                         }
                     }, label: {
-                        deleteIcon
+                        toolIcon(imageName: "trash.fill")
                     })
                     .padding([.trailing, .bottom])
                 }
@@ -74,45 +80,50 @@ struct ImagePikcerView: View{
         }
     }
     
-    private var galeryIcon: some View{
+    
+    private func toolIcon(imageName: String) -> some View{
         ZStack(alignment: .center){
             RoundedRectangle(cornerRadius: 10)
                 .foregroundColor(.white)
                 .frame(width: 45, height: 45)
                 .opacity(0.7)
-            Image(systemName: "photo")
+            Image(systemName: imageName)
                 .foregroundColor(.secondary)
                 .font(.system(size: 25))
                 .opacity(0.9)
         }
     }
     
-    private var deleteIcon: some View{
-        ZStack(alignment: .center){
-            RoundedRectangle(cornerRadius: 10)
-                .foregroundColor(.white)
-                .frame(width: 45, height: 45)
-                .opacity(0.7)
-            Image(systemName: "trash.fill")
-                .foregroundColor(.secondary)
-                .font(.system(size: 25))
-                .opacity(0.9)
+    private var wikiImage: some View{
+        ZStack{
+            AsyncImage(url: vm.imageURL!){ image in
+                image
+                    .resizable()
+                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.35)
+            } placeholder: {
+                ZStack{
+                    defaultImage
+                    ProgressView()
+                }
+            }
+            photoIcon
+        }
+    }
+    
+    private var photoIcon: some View{
+        HStack{
+            Spacer()
+            VStack{
+                Spacer()
+                toolIcon(imageName: "photo")
+                    .padding([.trailing, .bottom])
+            }
         }
     }
     
     private var defaultImage: some View{
-        ZStack{
-            Image("default")
-                .resizable()
-                .frame(width: UIScreen.main.bounds.width, height: 250)
-            HStack{
-                Spacer()
-                VStack{
-                    Spacer()
-                    galeryIcon
-                        .padding([.trailing, .bottom])
-                }
-            }
-        }
+        Image("default")
+            .resizable()
+            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.35)
     }
 }

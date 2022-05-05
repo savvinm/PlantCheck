@@ -3,6 +3,8 @@
     <entity name="Plant" representedClassName="Plant" syncable="YES" codeGenerationType="class">
         <attribute name="creationDate" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="genus" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="imagesData" optional="YES" attributeType="Binary"/>
         <attribute name="location" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="nextWatering" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -10,6 +12,6 @@
         <attribute name="wikiDescription" optional="YES" attributeType="String"/>
     </entity>
     <elements>
-        <element name="Plant" positionX="-6021.990234375" positionY="-3145.9755859375" width="128" height="148"/>
+        <element name="Plant" positionX="-6021.990234375" positionY="-3145.9755859375" width="128" height="164"/>
     </elements>
 </model>

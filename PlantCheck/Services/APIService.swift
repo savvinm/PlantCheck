@@ -54,22 +54,26 @@ class APIService{
         .resume()
     }
     
-    func fetchThumbnailsFromWiki(pageTitles: [String], completion: @escaping (Result<WikiThumbnailModel,APIError>) -> Void) {
-        var titles = ""
+    func fetchImagesFromWiki(pageTitles: [String], pithumbsize: Int? = nil, completion: @escaping (Result<WikiImageModel,APIError>) -> Void) {
+        var tail = "&titles="
         for index in 0..<pageTitles.count{
-            titles += pageTitles[index].replacingOccurrences(of: " ", with: "%20")
+            tail += pageTitles[index].replacingOccurrences(of: " ", with: "%20")
             if index < pageTitles.count-1{
-                titles += "%7C"
+                tail += "%7C"
             }
+        }
+        if let size = pithumbsize{
+            tail += "&pithumbsize=" + String(size)
+        } else{
+            tail += "&piprop=original"
         }
         var urlComponents = URLComponents(string: "https://en.wikipedia.org/w/api.php?")!
         urlComponents.queryItems = [
         "action": "query",
         "formatversion": "2",
-        "pithumbsize": "100",
         "prop": "pageimages",
         "format": "json"].map { URLQueryItem(name: $0.key, value: $0.value) }
-        let urlString = urlComponents.url!.absoluteString + "&titles=" + titles
+        let urlString = urlComponents.url!.absoluteString + tail
 
         guard let url = URL(string: urlString) else{
             completion(.failure(.invalidURL))
@@ -98,7 +102,7 @@ class APIService{
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .useDefaultKeys
             do {
-                let decodedData = try decoder.decode(WikiThumbnailModel.self, from: data)
+                let decodedData = try decoder.decode(WikiImageModel.self, from: data)
                 completion(.success(decodedData))
             } catch {
                 completion(.failure(.decodingError))

@@ -1,5 +1,5 @@
 //
-//  WikiThumbnailModel.swift
+//  WikiImageModel.swift
 //  PlantCheck
 //
 //  Created by Maksim Savvin on 03.05.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct WikiThumbnailModel: Codable{
+struct WikiImageModel: Codable{
     let batchcomplete: Bool
     let query: WikiQuery
     
@@ -18,9 +18,10 @@ struct WikiThumbnailModel: Codable{
     struct WikiPage: Codable{
         let pageid: Int
         let title: String
-        let thumbnail: WikiThumbnail?
+        let thumbnail: WikiImage?
+        let original: WikiImage?
     }
-    struct WikiThumbnail: Codable{
+    struct WikiImage: Codable{
         let source: String
     }
 }

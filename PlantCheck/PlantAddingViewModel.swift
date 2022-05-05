@@ -11,14 +11,20 @@ import SwiftUI
 
 class PlantAddingViewModel: ObservableObject{
     
+    private(set) var wateringIntervals = [1 : "Everyday", 2 : "Every 2 days", 3 : "Every 3 days", 7 : "Every week", 30 : "Every month"]
+    var intervals: [Int]{
+        wateringIntervals.keys.sorted()
+    }
     private var genuses: [String]
     private(set) var options: [String]
     private(set) var thumbnails: [String: URL]
+    private(set) var imageURL: URL?
     
     @Published var showingImagePicker = false
     
     var imageCount: Int = 0{
         didSet{
+            updateImage()
             DispatchQueue.main.async {
                 [ weak self ] in
                 self?.objectWillChange.send()
@@ -36,13 +42,21 @@ class PlantAddingViewModel: ObservableObject{
     }
     var genus = "" {
         didSet{
-            updateOptions()
+            if genus != oldValue{
+                updateImage()
+                updateOptions()
+                updateFilled()
+            }
         }
     }
-    
-    @Published var name = ""
-    @Published var location = ""
-    var wateringInterval = 1
+    @Published var isAllFilled = false
+    var name = ""
+    var location = ""
+    @Published var wateringInterval = 0{
+        didSet{
+            updateFilled()
+        }
+    }
     @Published var genusIsFocused = false
 
     private let api: APIService
@@ -64,6 +78,49 @@ class PlantAddingViewModel: ObservableObject{
         }
     }
     
+    private func updateImage(){
+        imageURL = nil
+        if imageCount == 0{
+            if checkGenus(){
+                api.fetchImagesFromWiki(pageTitles: [genus]) { result in
+                    switch result {
+                    case .success(let query):
+                        guard let page = query.query.pages.first else {
+                            return
+                        }
+                        if self.genus == page.title{
+                            if let source = page.original?.source{
+                                guard let url = URL(string: source) else {
+                                    return
+                                }
+                                DispatchQueue.main.async {
+                                    [ weak self ] in
+                                    self?.imageURL = url
+                                    self?.objectWillChange.send()
+                                }
+                            }
+                        }
+                    case .failure(let error):
+                        print(error)
+                        return
+                    }
+                }
+            }
+        }
+    }
+    
+    private func updateFilled(){
+        if checkGenus() && wateringInterval != 0{
+            isAllFilled = true
+        }
+        else{
+            isAllFilled = false
+        }
+    }
+    
+    private func checkGenus() -> Bool{
+        genuses.contains(genus.trimmingCharacters(in: .whitespacesAndNewlines))
+    }
     
     func removeImage(_ image: UIImage){
         if let index = images.firstIndex(of: image){
@@ -77,7 +134,7 @@ class PlantAddingViewModel: ObservableObject{
             fetchThumbnails(withLimit: limit, for: Array(titles.suffix(limit)))
             return
         }
-        api.fetchThumbnailsFromWiki(pageTitles: titles){ result in
+        api.fetchImagesFromWiki(pageTitles: titles, pithumbsize: 100){ result in
             switch result{
             case .success(let query):
                 self.thumbnails = [:]
@@ -90,9 +147,6 @@ class PlantAddingViewModel: ObservableObject{
                             print("Wrong URL format")
                         }
                     }
-                    else{
-                        //self.thumbnails[item.title] = URL(string: "none")
-                    }
                 }
                 DispatchQueue.main.async {
                     [ weak self ] in
@@ -104,7 +158,7 @@ class PlantAddingViewModel: ObservableObject{
         }
     }
     
-    func updateOptions(){
+    private func updateOptions(){
         objectWillChange.send()
         options = []
         if genus == ""{
@@ -126,12 +180,19 @@ class PlantAddingViewModel: ObservableObject{
     
     func addPlant(viewContext: NSManagedObjectContext){
         let newPlant = Plant(context: viewContext)
+        newPlant.id = UUID()
         newPlant.name = name
         newPlant.genus = genus
         newPlant.wateringInterval = Int16(wateringInterval)
         newPlant.location = location
         newPlant.creationDate = Date()
         newPlant.nextWatering = Date() + Double(wateringInterval) * 86400
+        do{
+            newPlant.imagesData = try NSKeyedArchiver.archivedData(withRootObject: images, requiringSecureCoding: false)
+        } catch {
+            print("Error archiving images")
+            return
+        }
         do {
             try viewContext.save()
         } catch {
