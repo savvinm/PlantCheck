@@ -15,6 +15,8 @@
 		B54C2344281C059500DDA412 /* PlantCheck.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B54C2342281C059500DDA412 /* PlantCheck.xcdatamodeld */; };
 		B54C322E2822694B00D58A27 /* ImagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54C322D2822694B00D58A27 /* ImagePickerView.swift */; };
 		B54C3231282332FD00D58A27 /* OptionsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54C3230282332FC00D58A27 /* OptionsList.swift */; };
+		B54C32332824761200D58A27 /* Plant.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54C32322824761200D58A27 /* Plant.swift */; };
+		B54C323528252ABC00D58A27 /* FileSystemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54C323428252ABB00D58A27 /* FileSystemManager.swift */; };
 		B56E70AE282153DD007A2626 /* PlantAddingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56E70AD282153DD007A2626 /* PlantAddingViewModel.swift */; };
 		B56E70B028216AAA007A2626 /* WikiPageRevisionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56E70AF28216AAA007A2626 /* WikiPageRevisionModel.swift */; };
 		B56E70B228217F56007A2626 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56E70B128217F56007A2626 /* APIService.swift */; };
@@ -34,6 +36,8 @@
 		B54C2343281C059500DDA412 /* PlantCheck.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PlantCheck.xcdatamodel; sourceTree = "<group>"; };
 		B54C322D2822694B00D58A27 /* ImagePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerView.swift; sourceTree = "<group>"; };
 		B54C3230282332FC00D58A27 /* OptionsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsList.swift; sourceTree = "<group>"; };
+		B54C32322824761200D58A27 /* Plant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plant.swift; sourceTree = "<group>"; };
+		B54C323428252ABB00D58A27 /* FileSystemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemManager.swift; sourceTree = "<group>"; };
 		B56E70AD282153DD007A2626 /* PlantAddingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantAddingViewModel.swift; sourceTree = "<group>"; };
 		B56E70AF28216AAA007A2626 /* WikiPageRevisionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiPageRevisionModel.swift; sourceTree = "<group>"; };
 		B56E70B128217F56007A2626 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
@@ -82,6 +86,7 @@
 				B56E70BB2821E0BA007A2626 /* Services */,
 				B56E70BA2821E09F007A2626 /* Views */,
 				B56E70B328218C9E007A2626 /* WikiAPI */,
+				B54C32322824761200D58A27 /* Plant.swift */,
 			);
 			path = PlantCheck;
 			sourceTree = "<group>";
@@ -120,6 +125,7 @@
 			children = (
 				B56E70B128217F56007A2626 /* APIService.swift */,
 				B576C2DF281F2D0100A05A5A /* ImagePicker.swift */,
+				B54C323428252ABB00D58A27 /* FileSystemManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -199,12 +205,14 @@
 				B54C2341281C059500DDA412 /* Persistence.swift in Sources */,
 				B54C233A281C059300DDA412 /* HomeView.swift in Sources */,
 				B54C322E2822694B00D58A27 /* ImagePickerView.swift in Sources */,
+				B54C323528252ABC00D58A27 /* FileSystemManager.swift in Sources */,
 				B56E70AE282153DD007A2626 /* PlantAddingViewModel.swift in Sources */,
 				B576C2E0281F2D0100A05A5A /* ImagePicker.swift in Sources */,
 				B54C2338281C059300DDA412 /* PlantCheckApp.swift in Sources */,
 				B54C3231282332FD00D58A27 /* OptionsList.swift in Sources */,
 				B56E70B72821B5A1007A2626 /* WikiImageModel.swift in Sources */,
 				B576C2DE281EFE8000A05A5A /* AddPlantView.swift in Sources */,
+				B54C32332824761200D58A27 /* Plant.swift in Sources */,
 				B56E70B228217F56007A2626 /* APIService.swift in Sources */,
 				B56E70B028216AAA007A2626 /* WikiPageRevisionModel.swift in Sources */,
 			);

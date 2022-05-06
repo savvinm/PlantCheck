@@ -13,6 +13,7 @@ struct AddPlantView: View {
 
     @FocusState var genusFieldIsFocused: Bool
     @ObservedObject var vm = PlantAddingViewModel()
+    @State var isSaving = false
     
     var body: some View {
         ScrollView{
@@ -43,18 +44,28 @@ struct AddPlantView: View {
     
     private var toolsOverlay: some View{
         VStack{
-            HStack{
-                Spacer()
-                Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }, label: {
-                    Image(systemName: "x.circle.fill")
-                        .font(.system(size: 25))
-                        .foregroundColor(.secondary)
-                        .opacity(0.95)
-                })
+            if isSaving{
+                ZStack(alignment: .center){
+                    Rectangle()
+                        .background(.thickMaterial)
+                        .opacity(0.6)
+                    ProgressView()
+                }
             }
-            Spacer()
+            else{
+                HStack{
+                    Spacer()
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }, label: {
+                        Image(systemName: "x.circle.fill")
+                            .font(.system(size: 25))
+                            .foregroundColor(.secondary)
+                            .opacity(0.95)
+                    })
+                }
+                Spacer()
+            }
         }
         .padding()
     }
@@ -62,8 +73,12 @@ struct AddPlantView: View {
     
     private var saveButton: some View{
         Button(action: {
-            vm.addPlant(viewContext: viewContext)
-            self.presentationMode.wrappedValue.dismiss()
+            isSaving = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)){
+                vm.addPlant(viewContext: viewContext, isPresented: presentationMode)
+            }
+            //vm.addPlant(viewContext: viewContext, isPresented: presentationMode)
+            //self.presentationMode.wrappedValue.dismiss()
         }, label: {
             HStack{
                 Text("Save")

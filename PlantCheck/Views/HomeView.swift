@@ -10,7 +10,7 @@ import CoreData
 
 struct HomeView: View {
     @Environment(\.managedObjectContext) private var viewContext
-
+    let fsm = FileSystemManager()
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Plant.name, ascending: true)],
         animation: .default)
@@ -22,7 +22,19 @@ struct HomeView: View {
             List {
                 ForEach(plants) { plant in
                     VStack{
-                        Text(plant.name!)
+                        VStack{
+                            if plant.imagesPath == nil{
+                                Image("default")
+                                    .resizable()
+                                    .scaledToFit()
+                            }
+                            else{
+                                Image(uiImage: (plant.getThumbnail(with: fsm))!)
+                                    .resizable()
+                                    .scaledToFit()
+                            }
+                        }
+                        Text(plant.name ?? "empty name")
                         Text(plant.creationDate!.formatted())
                         Text(plant.nextWatering!.formatted())
                     }

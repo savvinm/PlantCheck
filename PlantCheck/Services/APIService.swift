@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import SwiftUI
+
 class APIService{
     @Published var status: Bool = false
    
@@ -110,7 +112,42 @@ class APIService{
 
         }
         .resume()
-    }}
+    }
+    
+    
+    func downloadImage(from url: URL, completion: @escaping (Result<UIImage,APIError>) -> Void) {
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            guard
+                let httpResponse = response as? HTTPURLResponse,
+                httpResponse.statusCode == 200
+            else {
+                completion(.failure(.invalidResponseStatus))
+                return
+            }
+            guard
+                error == nil
+            else {
+                completion(.failure(.dataTaskError))
+                return
+            }
+            guard
+                let data = data
+            else {
+                completion(.failure(.corruptData))
+                return
+            }
+            guard let image = UIImage(data: data) else {
+                completion(.failure(.decodingError))
+                return
+            }
+            completion(.success(image))
+        }
+        .resume()
+    }
+}
+
+
+
 
 enum APIError: Error {
     case invalidURL

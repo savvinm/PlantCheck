@@ -61,6 +61,7 @@ class PlantAddingViewModel: ObservableObject{
 
     private let api: APIService
     private let parser: WikiParser
+    private let fsm: FileSystemManager
     
     init(){
         genuses = []
@@ -68,6 +69,7 @@ class PlantAddingViewModel: ObservableObject{
         thumbnails = [:]
         parser = WikiParser()
         api = APIService()
+        fsm = FileSystemManager()
         api.fetchPageFromWiki(pageTitle: "Houseplant"){ result in
             switch result {
             case .success(let query):
@@ -82,14 +84,23 @@ class PlantAddingViewModel: ObservableObject{
         imageURL = nil
         if imageCount == 0{
             if checkGenus(){
-                api.fetchImagesFromWiki(pageTitles: [genus]) { result in
+                /*api.fetchPageFromWiki(pageTitle: genus){ result in
+                    switch result{
+                    case.success(let query):
+                        self.parser.parseDescription(from: query)
+                    case.failure(let error):
+                        print(error)
+                    }
+                }*/
+                
+                api.fetchImagesFromWiki(pageTitles: [genus], pithumbsize: 1000) { result in
                     switch result {
                     case .success(let query):
                         guard let page = query.query.pages.first else {
                             return
                         }
                         if self.genus == page.title{
-                            if let source = page.original?.source{
+                            if let source = page.thumbnail?.source{
                                 guard let url = URL(string: source) else {
                                     return
                                 }
@@ -178,27 +189,59 @@ class PlantAddingViewModel: ObservableObject{
         }
     }
     
-    func addPlant(viewContext: NSManagedObjectContext){
+    
+    func addPlant(viewContext: NSManagedObjectContext, isPresented: Binding<PresentationMode>){
+        let id = UUID()
         let newPlant = Plant(context: viewContext)
-        newPlant.id = UUID()
-        newPlant.name = name
+        newPlant.id = id
+        newPlant.name = name == "" ? nil : name
         newPlant.genus = genus
         newPlant.wateringInterval = Int16(wateringInterval)
-        newPlant.location = location
+        newPlant.location = location == "" ?  nil : location
         newPlant.creationDate = Date()
         newPlant.nextWatering = Date() + Double(wateringInterval) * 86400
-        do{
-            newPlant.imagesData = try NSKeyedArchiver.archivedData(withRootObject: images, requiringSecureCoding: false)
-        } catch {
-            print("Error archiving images")
-            return
+        
+        if imageCount == 0 && imageURL != nil{
+            guard let url = imageURL else {
+                print("Saving error: empty image URL")
+                return
+            }
+            api.downloadImage(from: url){ result in
+                switch result{
+                case.success(let image):
+                    self.images.append(image)
+                    if let path = self.fsm.saveImages(images: self.images, plantId: id){
+                        newPlant.imagesPath = path.joined(separator: "%20")
+                    }
+                    do {
+                        try viewContext.save()
+                        isPresented.wrappedValue.dismiss()
+                    } catch {
+                        // Replace this implementation with code to handle the error appropriately.
+                        // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                        let nsError = error as NSError
+                        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+                    }
+                case.failure(let error):
+                    print(error)
+                }
+            }
         }
-        do {
-            try viewContext.save()
-        } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        else{
+            if imageCount > 0{
+                if let paths = fsm.saveImages(images: images, plantId: id){
+                    newPlant.imagesPath = paths.joined(separator: "%20")
+                }
+            }
+            do {
+                try viewContext.save()
+                isPresented.wrappedValue.dismiss()
+            } catch {
+                // Replace this implementation with code to handle the error appropriately.
+                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                let nsError = error as NSError
+                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            }
         }
-    }}
+    }
+}
