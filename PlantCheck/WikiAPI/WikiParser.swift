@@ -34,31 +34,67 @@ class WikiParser{
         }
     }
     
-    func parseDescription(from query: WikiPageRevisionModel) -> [String: String]{
-        let parts = query.query.pages.first!.revisions.first!.slots.main.content.components(separatedBy: "==")
-        var trimmed = [String]()
-        for part in parts{
-            trimmed.append(part.trimmingCharacters(in: .whitespacesAndNewlines))
+    func parseDescription(from query: WikiPageRevisionModel) -> String{
+        if let text = query.query.pages.first?.revisions.first?.slots.main.content{
+            if let description = getParagraph(in: text, title: "Description"){
+                parseParagraph(clearParagraph(paragraph: description))
+            }
         }
-        var descriptionParts = [String: String]()
-        if let index = trimmed.firstIndex(of: "Description and biology"){
-            descriptionParts["Description"] = clearParagraph(paragraph: trimmed[index + 1])
+        return ""
+    }
+    
+    private func parseParagraph(_ text: String) -> [String: String]?{
+        var res = [String: String]()
+        let clearText = text.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "\n\n", with: "\n")
+        let parts = clearText.components(separatedBy: "\n")
+        var title = "body"
+        var tmp = ""
+        for index in parts.indices{
+            if parts[index].first == "=" && parts[index].last == "="{
+                if tmp != ""{
+                    res[title] = tmp
+                    tmp = ""
+                }
+                title = parts[index].replacingOccurrences(of: "=", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+            else{
+                tmp += parts[index] + "\n"
+            }
         }
-        if let index = trimmed.firstIndex(of: "Description"){
-            descriptionParts["Description"] = clearParagraph(paragraph: trimmed[index + 1])
+        if tmp != ""{
+            res[title] = tmp
         }
-        if let index = trimmed.firstIndex(of: "Cultivation"){
-           // descriptionParts["Cultivation"] = trimmed[index + 1]
+        return res
+    }
+    
+    private func getParagraph(in text: String, title: String) -> String?{
+        if text.contains(title){
+            var res = ""
+            let parts = text.components(separatedBy: "==")
+            if let startIndex = parts.firstIndex(where: { $0.contains(title) }){
+                if startIndex + 1 < parts.count{
+                    res += parts[startIndex + 1]
+                    for index in startIndex + 2..<parts.count{
+                        if parts[index].first == "="{
+                            res += parts[index]
+                        }
+                        else{
+                            return res
+                        }
+                    }
+                }
+            }
         }
-        print(descriptionParts)
-        return descriptionParts
+        return nil
+        
     }
     
     private func clearParagraph(paragraph: String) -> String{
         var res = paragraph.replacingOccurrences(of: "\'\'", with: "")
         res = res.replacingOccurrences(of: "\"", with: "")
-        res = handleHyperLinksAndFiles(text: res)
+        res = res.replacingOccurrences(of: "\'", with: "")
         res = handleLinks(text: res)
+        res = handleHyperLinksAndFiles(text: res)
         res = handleConvertions(text: res)
         return res
     }
@@ -84,51 +120,49 @@ class WikiParser{
         if parts.count < 3{
             return ""
         }
-        var res = ""
         if parts[2] == "-"{
-            res += "\(parts[1])-\(parts[3]) \(parts[4])"
+            return "\(parts[1])-\(parts[3]) \(parts[4])"
+        }
+        if parts[2] == "to"{
+            return "\(parts[1]) to \(parts[3]) \(parts[4])"
         }
         else{
-            res += "\(parts[1]) \(parts[2])"
+            return "\(parts[1]) \(parts[2])"
         }
-        return res
     }
     
     private func handleLinks(text: String) -> String{
-        let arrayString = Array(text)
-        if arrayString.firstIndex(of: "<") == nil{
-            return text
-        }
+        let stringArray = Array(text)
         var res = ""
-        let startIndex = arrayString.firstIndex(of: "<")!
-        res += arrayString[0..<startIndex]
-        if let endIndex = arrayString.firstIndex(of: ">"){
-            if arrayString[startIndex...endIndex].contains("/"){
-                if endIndex + 1 < arrayString.count{
-                    res += handleLinks(text: String(arrayString[endIndex + 1..<arrayString.count]))
+        var openBracetCount = 0
+        var closeBracetCount = 0
+        var lastSlashIndex: Int?
+        for index in stringArray.indices{
+            if stringArray[index] == "/"{
+                lastSlashIndex = index
+            }
+            if stringArray[index] == "<"{
+                openBracetCount += 1
+                if openBracetCount == 1{
+                    res += stringArray[0..<index]
                 }
             }
-            else{
-                if let endIndex = nextIndexOf(element: ">", in: arrayString, startIndex: endIndex){
-                    if endIndex + 1 < arrayString.count{
-                        res += handleLinks(text: String(arrayString[endIndex + 1..<arrayString.count]))
+            if stringArray[index] == ">"{
+                closeBracetCount += 1
+                if closeBracetCount == openBracetCount{
+                    if let slashIndex = lastSlashIndex{
+                        if slashIndex + 4 >= index && index + 1 < stringArray.count{
+                            res += handleLinks(text: String(stringArray[index + 1..<stringArray.endIndex]))
+                            break
+                        }
                     }
                 }
-                
-                
             }
+        }
+        if openBracetCount == closeBracetCount && openBracetCount == 0{
+            res += text
         }
         return res
-    }
-    private func nextIndexOf(element: Character, in array: [Character], startIndex: Int) -> Int?{
-        if startIndex < array.count{
-            for index in startIndex + 1..<array.count{
-                if array[index] == element{
-                    return index
-                }
-            }
-        }
-        return nil
     }
     
     private func handleLinkOrFile(text: String) -> String{
@@ -150,14 +184,25 @@ class WikiParser{
     private func handleHyperLinksAndFiles(text: String) -> String{
         var res = ""
         let parts = text.components(separatedBy: "[[")
-        for part in parts{
-            let smallParts = part.components(separatedBy: "]]")
-            if smallParts.count == 1{
-                res += smallParts.first!
+        var index = 0
+        while index < parts.count{
+            // case [[File: .... [[hyperlink]]]]
+            if index + 1 < parts.count && parts[index + 1].contains("]]]]"){
+                let smallParts = parts[index + 1].components(separatedBy: "]]]]")
+                res += smallParts[1]
+                res += handleLinkOrFile(text: parts[index] + smallParts[0])
+                index += 2
             }
             else{
-                res += handleLinkOrFile(text: smallParts[0])
-                res += smallParts[1]
+                let smallParts = parts[index].components(separatedBy: "]]")
+                if smallParts.count == 1{
+                    res += smallParts.first!
+                }
+                else{
+                    res += handleLinkOrFile(text: smallParts[0])
+                    res += smallParts[1]
+                }
+                index += 1
             }
         }
         return res
