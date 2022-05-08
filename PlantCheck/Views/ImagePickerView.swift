@@ -19,12 +19,10 @@ struct ImagePikcerView: View{
                         photoIcon
                     }
                     .padding(.bottom)
-                }
-                else {
+                } else {
                     wikiImage.padding(.bottom)
                 }
-            }
-            else{
+            } else {
                 ScrollView(.horizontal, showsIndicators: false, content: {
                     HStack{
                         ForEach(vm.images, id : \.self){ img in
@@ -47,8 +45,7 @@ struct ImagePikcerView: View{
         HStack(alignment: .center){
             if vm.imageCount <= 1{
                 Text("1of1").opacity(0)
-            }
-            else{
+            } else {
                 Text(String(vm.images.firstIndex(of: img)! + 1) + " of " + String(vm.imageCount))
             }
         }

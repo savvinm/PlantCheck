@@ -15,8 +15,7 @@ struct OptionsList: View{
         VStack{
             if vm.options.isEmpty{
                 emptyMessage
-            }
-            else{
+            } else {
                 ForEach(vm.options, id: \.self){ option in
                     optionView(for: option)
                 }
@@ -27,9 +26,9 @@ struct OptionsList: View{
     private func optionView(for option: String) -> some View{
         Button(action: {
             withAnimation(.easeInOut){
-                vm.genus = option
-                vm.genusIsFocused = false
                 genusFieldIsFocused = false
+                vm.genusIsFocused = false
+                vm.genus = option
             }
         }, label: {
             HStack{
@@ -64,8 +63,7 @@ struct OptionsList: View{
                 } placeholder: {
                     Rectangle().foregroundColor(Color.clear)
                 }
-            }
-            else{
+            } else {
                 Image("default")
                     .resizable()
                     .scaledToFill()

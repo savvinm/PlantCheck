@@ -21,22 +21,24 @@ struct HomeView: View {
         NavigationView{
             List {
                 ForEach(plants) { plant in
-                    VStack{
+                    NavigationLink(destination: { Text(plant.wikiDescription ?? "empty") }){
                         VStack{
-                            if plant.imagesPath == nil{
-                                Image("default")
-                                    .resizable()
-                                    .scaledToFit()
+                            VStack{
+                                if plant.imagesPath == nil{
+                                    Image("default")
+                                        .resizable()
+                                        .scaledToFit()
+                                }
+                                else{
+                                    Image(uiImage: (plant.getThumbnail(with: fsm))!)
+                                        .resizable()
+                                        .scaledToFit()
+                                }
                             }
-                            else{
-                                Image(uiImage: (plant.getThumbnail(with: fsm))!)
-                                    .resizable()
-                                    .scaledToFit()
-                            }
+                            Text(plant.name ?? "empty name")
+                            Text(plant.creationDate!.formatted())
+                            Text(plant.nextWatering!.formatted())
                         }
-                        Text(plant.name ?? "empty name")
-                        Text(plant.creationDate!.formatted())
-                        Text(plant.nextWatering!.formatted())
                     }
                 }
                 .onDelete(perform: deleteItems)

@@ -5,10 +5,9 @@
 //  Created by Maksim Savvin on 06.05.2022.
 //
 
-import Foundation
 import SwiftUI
 
-class FileSystemManager{
+final class FileSystemManager{
     
     private let baseURLs = FileManager.default.urls(for: .documentDirectory, in: FileManager.SearchPathDomainMask.userDomainMask)
     
@@ -23,8 +22,7 @@ class FileSystemManager{
             let url = baseURL.appendingPathComponent(name)
             if !saveImageInFS(image: images[index], path: url){
                 print("Error saving image number \(index)")
-            }
-            else{
+            } else {
                 paths.append(name)
             }
         }
@@ -32,15 +30,16 @@ class FileSystemManager{
     }
     
     private func saveImageInFS(image: UIImage, path: URL) -> Bool{
-        if let data = image.jpegData(compressionQuality: 0.4){
-            do{
-                try data.write(to: path)
-                return true
-            } catch{
-                print("Error saving image to file system")
-            }
+        guard let data = image.jpegData(compressionQuality: 0.4) else {
+            return false
         }
-        return false
+        do{
+            try data.write(to: path)
+            return true
+        } catch{
+            print("Error saving image to file system")
+            return false
+        }
     }
     
     func readImage(imageName: String) -> UIImage?{
@@ -52,8 +51,7 @@ class FileSystemManager{
         if let data = FileManager.default.contents(atPath: url.path),
            let image = UIImage(data: data){
             return image
-        }
-        else {
+        } else {
             print("Error reading image")
             return nil
         }

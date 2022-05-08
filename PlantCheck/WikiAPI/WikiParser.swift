@@ -7,40 +7,36 @@
 
 import Foundation
 
-class WikiParser{
+final class WikiParser{
     
     func parseListOfPlants(from query: WikiPageRevisionModel) -> [String]{
         var parts = query.query.pages.first!.revisions.first!.slots.main.content.components(separatedBy: "==List of common houseplants==")
-        if let tail = parts.last{
-            parts = tail.components(separatedBy: "==Notable specimens==")
-            if let body = parts.first{
-                parts = body.components(separatedBy: "\n")
-                var plants =  [String]()
-                for part in parts{
-                    if let plant = parsePlant(from: part){
-                        plants.append(plant)
-                    }
-                }
-                return plants
-            }
-            else{
-                print("Wrong page format: expected 'Notable specimes'")
-                return []
-            }
-        }
-        else{
+        guard let tail = parts.last else {
             print("Wrong page format: expected 'List of common houseplants'")
             return []
         }
+        parts = tail.components(separatedBy: "==Notable specimens==")
+        guard let body = parts.first else {
+            print("Wrong page format: expected 'Notable specimes'")
+            return []
+        }
+        parts = body.components(separatedBy: "\n")
+        var plants =  [String]()
+        for part in parts{
+            if let plant = parsePlant(from: part){
+                    plants.append(plant.trimmingCharacters(in: .whitespacesAndNewlines))
+                }
+            }
+        return plants
     }
     
-    func parseDescription(from query: WikiPageRevisionModel) -> String{
+    func parseDescription(from query: WikiPageRevisionModel) -> String?{
         if let text = query.query.pages.first?.revisions.first?.slots.main.content{
             if let description = getParagraph(in: text, title: "Description"){
-                parseParagraph(clearParagraph(paragraph: description))
+                return clearParagraph(paragraph: description)
             }
         }
-        return ""
+        return nil
     }
     
     private func parseParagraph(_ text: String) -> [String: String]?{
@@ -56,8 +52,7 @@ class WikiParser{
                     tmp = ""
                 }
                 title = parts[index].replacingOccurrences(of: "=", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-            }
-            else{
+            } else {
                 tmp += parts[index] + "\n"
             }
         }
@@ -68,25 +63,25 @@ class WikiParser{
     }
     
     private func getParagraph(in text: String, title: String) -> String?{
-        if text.contains(title){
-            var res = ""
-            let parts = text.components(separatedBy: "==")
-            if let startIndex = parts.firstIndex(where: { $0.contains(title) }){
-                if startIndex + 1 < parts.count{
-                    res += parts[startIndex + 1]
-                    for index in startIndex + 2..<parts.count{
-                        if parts[index].first == "="{
-                            res += parts[index]
-                        }
-                        else{
-                            return res
-                        }
-                    }
+        guard text.contains(title) else {
+            return nil
+        }
+        let parts = text.components(separatedBy: "==")
+        guard let startIndex = parts.firstIndex(where: { $0.contains(title) }) else {
+            return nil
+        }
+        var res = ""
+        if startIndex + 1 < parts.count{
+            res += parts[startIndex + 1]
+            for index in startIndex + 2..<parts.count{
+                if parts[index].first == "="{
+                    res += parts[index]
+                } else {
+                    return res
                 }
             }
         }
         return nil
-        
     }
     
     private func clearParagraph(paragraph: String) -> String{
@@ -106,8 +101,7 @@ class WikiParser{
             let smallParts = part.components(separatedBy: "}}")
             if smallParts.count == 1{
                 res += smallParts.first!
-            }
-            else{
+            } else {
                 res += handleConvertion(convertion: smallParts[0])
                 res += smallParts[1]
             }
@@ -126,9 +120,7 @@ class WikiParser{
         if parts[2] == "to"{
             return "\(parts[1]) to \(parts[3]) \(parts[4])"
         }
-        else{
-            return "\(parts[1]) \(parts[2])"
-        }
+        return "\(parts[1]) \(parts[2])"
     }
     
     private func handleLinks(text: String) -> String{
@@ -149,13 +141,13 @@ class WikiParser{
             }
             if stringArray[index] == ">"{
                 closeBracetCount += 1
-                if closeBracetCount == openBracetCount{
-                    if let slashIndex = lastSlashIndex{
-                        if slashIndex + 4 >= index && index + 1 < stringArray.count{
-                            res += handleLinks(text: String(stringArray[index + 1..<stringArray.endIndex]))
-                            break
-                        }
-                    }
+                if
+                    closeBracetCount == openBracetCount,
+                    let slashIndex = lastSlashIndex,
+                    slashIndex + 4 >= index && index + 1 < stringArray.count
+                {
+                    res += handleLinks(text: String(stringArray[index + 1..<stringArray.endIndex]))
+                    break
                 }
             }
         }
@@ -166,17 +158,17 @@ class WikiParser{
     }
     
     private func handleLinkOrFile(text: String) -> String{
-        if text.contains("File:") || text.contains("Image:"){
+        guard
+            !text.contains("File:"),
+            !text.contains("Image:")
+        else {
             return ""
         }
-        else{
-            let parts = text.components(separatedBy: "|")
-            if parts.count == 2{
-                return parts[1]
-            }
-            else{
-                return parts.first!
-            }
+        let parts = text.components(separatedBy: "|")
+        if parts.count == 2{
+            return parts[1]
+        } else {
+            return parts.first!
         }
     }
     
@@ -192,13 +184,11 @@ class WikiParser{
                 res += smallParts[1]
                 res += handleLinkOrFile(text: parts[index] + smallParts[0])
                 index += 2
-            }
-            else{
+            } else {
                 let smallParts = parts[index].components(separatedBy: "]]")
                 if smallParts.count == 1{
                     res += smallParts.first!
-                }
-                else{
+                } else {
                     res += handleLinkOrFile(text: smallParts[0])
                     res += smallParts[1]
                 }

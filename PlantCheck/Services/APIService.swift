@@ -5,7 +5,6 @@
 //  Created by Maksim Savvin on 03.05.2022.
 //
 
-import Foundation
 import SwiftUI
 
 class APIService{
@@ -31,15 +30,11 @@ class APIService{
                 completion(.failure(.invalidResponseStatus))
                 return
             }
-            guard
-                error == nil
-            else {
+            guard error == nil else {
                 completion(.failure(.dataTaskError))
                 return
             }
-            guard
-                let data = data
-            else {
+            guard let data = data else {
                 completion(.failure(.corruptData))
                 return
             }
@@ -66,7 +61,7 @@ class APIService{
         }
         if let size = pithumbsize{
             tail += "&pithumbsize=" + String(size)
-        } else{
+        } else {
             tail += "&piprop=original"
         }
         var urlComponents = URLComponents(string: "https://en.wikipedia.org/w/api.php?")!
@@ -89,15 +84,11 @@ class APIService{
                 completion(.failure(.invalidResponseStatus))
                 return
             }
-            guard
-                error == nil
-            else {
+            guard error == nil else {
                 completion(.failure(.dataTaskError))
                 return
             }
-            guard
-                let data = data
-            else {
+            guard let data = data else {
                 completion(.failure(.corruptData))
                 return
             }
@@ -124,15 +115,11 @@ class APIService{
                 completion(.failure(.invalidResponseStatus))
                 return
             }
-            guard
-                error == nil
-            else {
+            guard error == nil else {
                 completion(.failure(.dataTaskError))
                 return
             }
-            guard
-                let data = data
-            else {
+            guard let data = data else {
                 completion(.failure(.corruptData))
                 return
             }

@@ -48,26 +48,33 @@ struct AddPlantView: View {
                 ZStack(alignment: .center){
                     Rectangle()
                         .background(.thickMaterial)
-                        .opacity(0.6)
-                    ProgressView()
+                        .opacity(0.85)
+                    VStack{
+                        Spacer()
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: Color(red: 0.81, green: 1, blue: 0.78)))
+                            .padding()
+                        Text("Saving new plant")
+                            .foregroundColor(Color(red: 0.81, green: 1, blue: 0.78))
+                        Spacer()
+                        }
                 }
-            }
-            else{
+            } else {
                 HStack{
                     Spacer()
-                    Button(action: {
-                        presentationMode.wrappedValue.dismiss()
-                    }, label: {
-                        Image(systemName: "x.circle.fill")
-                            .font(.system(size: 25))
-                            .foregroundColor(.secondary)
-                            .opacity(0.95)
-                    })
+                        Button(action: {
+                            presentationMode.wrappedValue.dismiss()
+                        }, label: {
+                            Image(systemName: "x.circle.fill")
+                                .font(.system(size: 25))
+                                .foregroundColor(.secondary)
+                                .opacity(0.95)
+                        })
                 }
+                .padding()
                 Spacer()
             }
         }
-        .padding()
     }
     
     
@@ -77,8 +84,6 @@ struct AddPlantView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)){
                 vm.addPlant(viewContext: viewContext, isPresented: presentationMode)
             }
-            //vm.addPlant(viewContext: viewContext, isPresented: presentationMode)
-            //self.presentationMode.wrappedValue.dismiss()
         }, label: {
             HStack{
                 Text("Save")
@@ -163,8 +168,7 @@ struct AddPlantView: View {
                         withAnimation(.easeInOut){
                             if isBegin{
                                 vm.genusIsFocused = true
-                            }
-                            else{
+                            } else {
                                 vm.genusIsFocused = false
                             }
                         }
@@ -222,8 +226,7 @@ private struct MenuPicker: View{
         HStack{
             if vm.wateringInterval == 0{
                 Text("Select")
-            }
-            else{
+            } else {
                 Text(vm.wateringIntervals[selection]!)
             }
         }
