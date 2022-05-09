@@ -16,62 +16,66 @@ struct AddPlantView: View {
     @State var isSaving = false
     
     var body: some View {
-        ScrollView{
-            ImagePikcerView(vm: vm)
-                .frame(maxWidth: UIScreen.main.bounds.width)
-            VStack{
-                genusSelector
-                nameAndLocationFields
-                wateringInformation
-                saveButton
+        GeometryReader{ geometry in
+            ScrollView(showsIndicators: false){
+                ImagePikcerView(vm: vm)
+                    .frame(maxWidth: geometry.size.width)
+                VStack{
+                    genusSelector
+                    nameAndLocationFields
+                    wateringInformation
+                    saveButton
+                }
+                .frame(width: geometry.size.width * 0.9)
+                .padding(.bottom, 50)
+                .padding(.top)
+                .onTapGesture {
+                    genusFieldIsFocused = false
+                }
             }
-            .frame(width: UIScreen.main.bounds.width * 0.9)
-            .padding(.bottom, 50)
-            .padding(.top)
-            .onTapGesture {
-                genusFieldIsFocused = false
+            .overlay(alignment: .topTrailing){
+                if isSaving{
+                    savingOverlay
+                }
+                else {
+                    closeButton
+                }
+            }
+            .background{
+                Image("background")
+                    .resizable()
+                    .ignoresSafeArea(.keyboard)
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .ignoresSafeArea(edges: .all)
+                    .opacity(0.25)
             }
         }
-        .overlay(content: { toolsOverlay })
-        .background(content: {
-            Image("background")
-                .resizable()
-                .scaledToFill()
-                .opacity(0.25)
-                .ignoresSafeArea(edges: .bottom)
-        })
     }
     
-    private var toolsOverlay: some View{
-        VStack{
-            if isSaving{
-                ZStack(alignment: .center){
-                    Rectangle()
-                        .background(.thickMaterial)
-                        .opacity(0.85)
-                    VStack{
-                        Spacer()
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: Color(red: 0.81, green: 1, blue: 0.78)))
-                            .padding()
-                        Text("Saving new plant")
-                            .foregroundColor(Color(red: 0.81, green: 1, blue: 0.78))
-                        Spacer()
-                        }
-                }
-            } else {
-                HStack{
-                    Spacer()
-                        Button(action: {
-                            presentationMode.wrappedValue.dismiss()
-                        }, label: {
-                            Image(systemName: "x.circle.fill")
-                                .font(.system(size: 25))
-                                .foregroundColor(.secondary)
-                                .opacity(0.95)
-                        })
-                }
-                .padding()
+    private var closeButton: some View{
+        Button(action: {
+            presentationMode.wrappedValue.dismiss()
+        }, label: {
+            Image(systemName: "x.circle.fill")
+                .font(.system(size: 25))
+                .foregroundColor(.secondary)
+                .opacity(0.95)
+        })
+        .padding()
+    }
+    
+    private var savingOverlay: some View{
+        ZStack(alignment: .center){
+            Rectangle()
+                .background(.thickMaterial)
+                .opacity(0.85)
+            VStack{
+                Spacer()
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: Color(red: 0.81, green: 1, blue: 0.78)))
+                    .padding()
+                Text("Saving new plant")
+                    .foregroundColor(Color(red: 0.81, green: 1, blue: 0.78))
                 Spacer()
             }
         }
@@ -106,6 +110,7 @@ struct AddPlantView: View {
         }
         .padding(.bottom)
     }
+    
     private func footnoteView(for text: String) -> some View{
         HStack{
             Text(text)
@@ -115,6 +120,7 @@ struct AddPlantView: View {
             Spacer()
         }
     }
+    
     private var nameAndLocationFields: some View{
         VStack(alignment: .leading){
             Text("Custom name and location").font(.headline)
@@ -173,6 +179,7 @@ struct AddPlantView: View {
                             }
                         }
                     })
+                    .disableAutocorrection(true)
                     .focused($genusFieldIsFocused)
                     .frame(height: 50)
                     .overlay(alignment: .trailing){

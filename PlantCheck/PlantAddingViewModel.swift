@@ -10,11 +10,15 @@ import SwiftUI
 
 class PlantAddingViewModel: ObservableObject{
     
-    private(set) var wateringIntervals = [1 : "Everyday", 2 : "Every 2 days", 3 : "Every 3 days", 7 : "Every week", 30 : "Every month"]
+    private(set) var wateringIntervals = [1 : "Everyday", 2 : "Every 2 days", 3 : "Every 3 days", 7 : "Every week", 14: "Every two weeks", 30 : "Every month"]
     var intervals: [Int]{
-        wateringIntervals.keys.sorted()
+        wateringIntervals.keys.sorted().reversed()
     }
-    private var genuses: [String]
+    private var genuses: [String]{
+        didSet{
+            fetchThumbnails(withLimit: 45, for: genuses)
+        }
+    }
     private var descriptionIsLoaded = false
     private var imageIsLoaded = false
     private(set) var options: [String]
@@ -23,7 +27,7 @@ class PlantAddingViewModel: ObservableObject{
     
     @Published var showingImagePicker = false
     
-    var imageCount: Int = 0
+    @Published var imageCount: Int = 0
     var images: [UIImage] = []{
         didSet{
             updateImages()
@@ -39,8 +43,8 @@ class PlantAddingViewModel: ObservableObject{
         }
     }
     @Published var isAllFilled = false
-    var name = ""
-    var location = ""
+    @Published var name = ""
+    @Published var location = ""
     @Published var wateringInterval = 0{
         didSet{
             updateFilled()
@@ -134,13 +138,11 @@ class PlantAddingViewModel: ObservableObject{
     
     private func fetchThumbnails(withLimit limit: Int, for titles: [String]){
         if titles.count > limit{
-            fetchThumbnails(withLimit: limit, for: Array(titles.suffix(limit)))
-            return
+            fetchThumbnails(withLimit: limit, for: Array(titles.suffix(titles.count - limit)))
         }
-        api.fetchImagesFromWiki(pageTitles: titles, pithumbsize: 100){ result in
+        api.fetchImagesFromWiki(pageTitles: Array(titles.prefix(limit)) , pithumbsize: 100){ result in
             switch result{
             case .success(let query):
-                self.thumbnails = [:]
                 for item in query.query.pages{
                     guard
                         let source = item.thumbnail?.source,
@@ -150,12 +152,6 @@ class PlantAddingViewModel: ObservableObject{
                         continue
                     }
                     self.thumbnails[item.title] = url
-                }
-                DispatchQueue.main.async { [ weak self ] in
-                    guard let self = self else {
-                        return
-                    }
-                    self.objectWillChange.send()
                 }
             case .failure(let error):
                 print(error)
@@ -183,7 +179,6 @@ class PlantAddingViewModel: ObservableObject{
         res = highPriority + lowPriority
         if !res.isEmpty{
             options = Array(res.prefix(5))
-            fetchThumbnails(withLimit: 50, for: options)
         }
     }
     
@@ -220,11 +215,11 @@ class PlantAddingViewModel: ObservableObject{
                 switch result{
                 case.success(let image):
                     self.images.append(image)
-                    guard let path = self.fsm.saveImages(images: self.images, plantId: id) else {
+                    guard let paths = self.fsm.saveImages(images: self.images, plantId: id) else {
                         print("Error saving images")
                         return
                     }
-                    newPlant.imagesPath = path.joined(separator: "%20")
+                    newPlant.imagesPath = paths.joined(separator: "%20")
                     self.imageIsLoaded = true
                     if self.descriptionIsLoaded{
                         if self.saveContext(viewContext){

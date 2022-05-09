@@ -20,25 +20,24 @@ final class FileSystemManager{
         for index in 0..<images.count{
             let name = plantId.uuidString + ".\(index).jpg"
             let url = baseURL.appendingPathComponent(name)
-            if !saveImageInFS(image: images[index], path: url){
-                print("Error saving image number \(index)")
-            } else {
+            do{
+                try saveImageInFS(image: images[index], path: url)
                 paths.append(name)
+            } catch {
+                print(error)
             }
         }
         return paths
     }
     
-    private func saveImageInFS(image: UIImage, path: URL) -> Bool{
+    private func saveImageInFS(image: UIImage, path: URL) throws {
         guard let data = image.jpegData(compressionQuality: 0.4) else {
-            return false
+            throw FSError.imageCompressingError
         }
         do{
             try data.write(to: path)
-            return true
         } catch{
-            print("Error saving image to file system")
-            return false
+            throw FSError.savingError
         }
     }
     
@@ -56,4 +55,24 @@ final class FileSystemManager{
             return nil
         }
     }
+    
+    func deleteFile(fileName: String) throws {
+        guard let baseURL = baseURLs.first else {
+            throw FSError.invalidSystemRoot
+        }
+        let url = baseURL.appendingPathComponent(fileName)
+        do{
+            try FileManager.default.removeItem(atPath: url.path)
+        } catch {
+            throw FSError.deletingError
+        }
+    }
+}
+
+enum FSError: Error{
+    case invalidSystemRoot
+    case readingError
+    case savingError
+    case deletingError
+    case imageCompressingError
 }

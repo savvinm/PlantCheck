@@ -19,44 +19,139 @@ struct HomeView: View {
     
     var body: some View {
         NavigationView{
-            List {
-                ForEach(plants) { plant in
-                    NavigationLink(destination: { Text(plant.wikiDescription ?? "empty") }){
-                        VStack{
-                            VStack{
-                                if plant.imagesPath == nil{
-                                    Image("default")
-                                        .resizable()
-                                        .scaledToFit()
-                                }
-                                else{
-                                    Image(uiImage: (plant.getThumbnail(with: fsm))!)
-                                        .resizable()
-                                        .scaledToFit()
-                                }
-                            }
-                            Text(plant.name ?? "empty name")
-                            Text(plant.creationDate!.formatted())
-                            Text(plant.nextWatering!.formatted())
-                        }
+            ScrollView{
+                LazyVGrid(columns: [GridItem(), GridItem()], alignment: .center, spacing: 20){
+                    ForEach(plants) { plant in
+                        plantPreview(for: plant)
+                            //.padding()
+                            .frame(width: UIScreen.main.bounds.width * 0.44, height: UIScreen.main.bounds.width * 0.66)
+                            .shadow(color: Color(.systemGray4), radius: 5, x: 5, y: 5)
                     }
                 }
-                .onDelete(perform: deleteItems)
+                .padding(.bottom)
+                .padding(.horizontal, 10)
             }
+            .ignoresSafeArea(.keyboard)
+            .sheet(isPresented: $isAddingSheetPresented, content: { AddPlantView() })
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
                 ToolbarItem {
                     Button(action: { isAddingSheetPresented = true}){
                         Image(systemName: "plus")
                     }
                 }
             }
-            .sheet(isPresented: $isAddingSheetPresented, content: { AddPlantView() })
+            .background{
+            Image("background")
+                .resizable()
+                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                .ignoresSafeArea(edges: .all)
+                .opacity(0.25)
+            }
         }
     }
 
+    private func plantPreview(for plant: Plant) -> some View{
+        GeometryReader{ geometry in
+            NavigationLink(destination: { PlantDetailView(plant: plant, fsm: fsm) }){
+            ZStack(alignment: .center){
+                    VStack{
+                        if plant.imagesPath == nil{
+                            Image("default")
+                                .resizable()
+        
+                        } else {
+                            Image(uiImage: (plant.getThumbnail(with: fsm))!)
+                                .resizable()
+                        }
+                    }
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    //.clipped()
+                    .overlay(alignment: .bottomLeading){
+                        imageOverlay(for: plant)
+                            .frame(width: geometry.size.width, height: geometry.size.height * 0.3)
+                    }
+                    //.overlay(imageOverlay(for: plant), alignment: .bottomLeading)
+
+            }
+            
+            .cornerRadius(15)
+        }
+        }
+    }
+    
+    private func imageOverlay(for plant: Plant) -> some View{
+        HStack{
+            VStack(alignment: .leading){
+                Spacer()
+                Text(plant.genus!)
+                    .font(.subheadline)
+                    .fontWeight(Font.Weight.semibold)
+                if plant.name != nil{
+                    Text(plant.name!)
+                        .font(.footnote)
+                        .lineLimit(1)
+                }
+                Spacer()
+            }
+            .multilineTextAlignment(.leading)
+            .padding(.horizontal, 10)
+                .foregroundColor(.black)
+            Spacer()
+        }
+        .background{
+            Rectangle()
+                .foregroundColor(.white)
+                .opacity(0.85)
+        }
+        //.cornerRadius(15)
+        //.padding(5)
+        //.opacity(0.8)
+    }
+    
+    /*
+     VStack(alignment: .center, spacing: 0){
+             VStack{
+                 if plant.imagesPath == nil{
+                     Image("default")
+                         .resizable()
+ 
+                 } else {
+                     Image(uiImage: (plant.getThumbnail(with: fsm))!)
+                         .resizable()
+                 }
+             }
+             .aspectRatio(contentMode: .fill)
+             .frame(width: geometry.size.width, height: geometry.size.height * 0.75)
+             //.clipped()
+
+             VStack(alignment: .leading){
+                 HStack{
+                     Text(plant.genus!)
+                         //.padding()
+                         .multilineTextAlignment(.leading)
+                         
+                         .font(.subheadline)
+                     
+                     Spacer()
+                 }
+                 Text("Name")
+                     .font(.footnote)
+             }
+             .foregroundColor(.primary)
+             .frame(width: geometry.size.width, height: geometry.size.height * 0.25)
+             .background{
+                 Rectangle()
+                     .foregroundColor(Color(.white))
+                     .opacity(1)
+             }
+         }
+     
+     .cornerRadius(15)
+     */
+    
+    
+    
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             offsets.map { plants[$0] }.forEach(viewContext.delete)
