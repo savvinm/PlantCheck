@@ -5,13 +5,21 @@
         <attribute name="genus" attributeType="String"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="imagesPath" optional="YES" attributeType="String" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="lastWatering" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="location" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="nextWatering" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="stringWateringInterval" attributeType="String"/>
         <attribute name="wateringInterval" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="wikiDescription" optional="YES" attributeType="String"/>
+        <relationship name="wateringIvents" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="WateringIvent" inverseName="plant" inverseEntity="WateringIvent"/>
+    </entity>
+    <entity name="WateringIvent" representedClassName="WateringIvent" syncable="YES" codeGenerationType="class">
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="plant" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Plant" inverseName="wateringIvents" inverseEntity="Plant"/>
     </entity>
     <elements>
-        <element name="Plant" positionX="-6021.990234375" positionY="-3145.9755859375" width="128" height="14"/>
+        <element name="Plant" positionX="-6420.966796875" positionY="-3351.990966796875" width="128" height="223"/>
+        <element name="WateringIvent" positionX="-6021" positionY="-3060" width="128" height="73"/>
     </elements>
 </model>

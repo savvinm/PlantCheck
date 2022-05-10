@@ -39,28 +39,6 @@ final class WikiParser{
         return nil
     }
     
-    private func parseParagraph(_ text: String) -> [String: String]?{
-        var res = [String: String]()
-        let clearText = text.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "\n\n", with: "\n")
-        let parts = clearText.components(separatedBy: "\n")
-        var title = "body"
-        var tmp = ""
-        for index in parts.indices{
-            if parts[index].first == "=" && parts[index].last == "="{
-                if tmp != ""{
-                    res[title] = tmp
-                    tmp = ""
-                }
-                title = parts[index].replacingOccurrences(of: "=", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-            } else {
-                tmp += parts[index] + "\n"
-            }
-        }
-        if tmp != ""{
-            res[title] = tmp
-        }
-        return res
-    }
     
     private func getParagraph(in text: String, title: String) -> String?{
         guard text.contains(title) else {

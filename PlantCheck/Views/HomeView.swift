@@ -12,7 +12,7 @@ struct HomeView: View {
     @Environment(\.managedObjectContext) private var viewContext
     let fsm = FileSystemManager()
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Plant.name, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Plant.genus, ascending: true)],
         animation: .default)
     private var plants: FetchedResults<Plant>
     @State var isAddingSheetPresented = false
@@ -23,7 +23,6 @@ struct HomeView: View {
                 LazyVGrid(columns: [GridItem(), GridItem()], alignment: .center, spacing: 20){
                     ForEach(plants) { plant in
                         plantPreview(for: plant)
-                            //.padding()
                             .frame(width: UIScreen.main.bounds.width * 0.44, height: UIScreen.main.bounds.width * 0.66)
                             .shadow(color: Color(.systemGray4), radius: 5, x: 5, y: 5)
                     }
@@ -96,61 +95,15 @@ struct HomeView: View {
             }
             .multilineTextAlignment(.leading)
             .padding(.horizontal, 10)
-                .foregroundColor(.black)
+            .foregroundColor(.black)
             Spacer()
         }
         .background{
             Rectangle()
                 .foregroundColor(.white)
-                .opacity(0.85)
+                .opacity(0.8)
         }
-        //.cornerRadius(15)
-        //.padding(5)
-        //.opacity(0.8)
     }
-    
-    /*
-     VStack(alignment: .center, spacing: 0){
-             VStack{
-                 if plant.imagesPath == nil{
-                     Image("default")
-                         .resizable()
- 
-                 } else {
-                     Image(uiImage: (plant.getThumbnail(with: fsm))!)
-                         .resizable()
-                 }
-             }
-             .aspectRatio(contentMode: .fill)
-             .frame(width: geometry.size.width, height: geometry.size.height * 0.75)
-             //.clipped()
-
-             VStack(alignment: .leading){
-                 HStack{
-                     Text(plant.genus!)
-                         //.padding()
-                         .multilineTextAlignment(.leading)
-                         
-                         .font(.subheadline)
-                     
-                     Spacer()
-                 }
-                 Text("Name")
-                     .font(.footnote)
-             }
-             .foregroundColor(.primary)
-             .frame(width: geometry.size.width, height: geometry.size.height * 0.25)
-             .background{
-                 Rectangle()
-                     .foregroundColor(Color(.white))
-                     .opacity(1)
-             }
-         }
-     
-     .cornerRadius(15)
-     */
-    
-    
     
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
@@ -167,13 +120,6 @@ struct HomeView: View {
         }
     }
 }
-
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

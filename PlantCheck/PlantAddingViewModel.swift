@@ -19,8 +19,7 @@ class PlantAddingViewModel: ObservableObject{
             fetchThumbnails(withLimit: 45, for: genuses)
         }
     }
-    private var descriptionIsLoaded = false
-    private var imageIsLoaded = false
+
     private(set) var options: [String]
     private(set) var thumbnails: [String: URL]
     private(set) var imageURL: URL?
@@ -182,36 +181,44 @@ class PlantAddingViewModel: ObservableObject{
         }
     }
     
-    private func saveContext(_ viewContext: NSManagedObjectContext) -> Bool{
-        do {
-            try viewContext.save()
-            return true
-        } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-        }
-    }
-    
-    func addPlant(viewContext: NSManagedObjectContext, isPresented: Binding<PresentationMode>){
+    func savePlant(viewContext: NSManagedObjectContext) throws {
         let id = UUID()
         let newPlant = Plant(context: viewContext)
         newPlant.id = id
         newPlant.name = name == "" ? nil : name
         newPlant.genus = genus
         newPlant.wateringInterval = Int16(wateringInterval)
+        newPlant.stringWateringInterval = wateringIntervals[wateringInterval]
         newPlant.location = location == "" ?  nil : location
+        
+        let wateringIvent = WateringIvent(context: viewContext)
+        wateringIvent.date = Date()
+        wateringIvent.plant = newPlant
+        
         newPlant.creationDate = Date()
+        newPlant.lastWatering = Date()
         newPlant.nextWatering = Date() + Double(wateringInterval) * 86400
         
-        
-        if imageCount == 0 && imageURL != nil{
-            guard let url = imageURL else {
-                print("Saving error: empty image URL")
-                return
+        let group = DispatchGroup()
+        group.enter()
+        api.fetchPageFromWiki(pageTitle: genus){ result in
+            switch result{
+            case.success(let query):
+                newPlant.wikiDescription = self.parser.parseDescription(from: query)
+                group.leave()
+            case.failure(let error):
+                print(error)
             }
-            api.downloadImage(from: url){ result in
+        }
+        var timeoutResult = group.wait(timeout: .now() + 2)
+        if timeoutResult == .timedOut{
+            viewContext.delete(newPlant)
+            throw SavingError.wikiDescriptionTimeout
+        }
+        
+        group.enter()
+        if imageCount == 0 && imageURL != nil{
+            api.downloadImage(from: imageURL!){ result in
                 switch result{
                 case.success(let image):
                     self.images.append(image)
@@ -220,12 +227,7 @@ class PlantAddingViewModel: ObservableObject{
                         return
                     }
                     newPlant.imagesPath = paths.joined(separator: "%20")
-                    self.imageIsLoaded = true
-                    if self.descriptionIsLoaded{
-                        if self.saveContext(viewContext){
-                            isPresented.wrappedValue.dismiss()
-                        }
-                    }
+                    group.leave()
                 case.failure(let error):
                     print(error)
                 }
@@ -237,26 +239,36 @@ class PlantAddingViewModel: ObservableObject{
             {
                 newPlant.imagesPath = paths.joined(separator: "%20")
             }
-            imageIsLoaded = true
-            if descriptionIsLoaded{
-                if saveContext(viewContext){
-                    isPresented.wrappedValue.dismiss()
-                }
-            }
+            group.leave()
         }
-        api.fetchPageFromWiki(pageTitle: genus){ result in
-            switch result{
-            case.success(let query):
-                newPlant.wikiDescription = self.parser.parseDescription(from: query)
-                self.descriptionIsLoaded = true
-                if self.imageIsLoaded{
-                    if self.saveContext(viewContext){
-                        isPresented.wrappedValue.dismiss()
-                    }
-                }
-            case.failure(let error):
-                print(error)
+        
+        timeoutResult = group.wait(timeout: .now() + 2)
+        switch timeoutResult{
+        case.success:
+            do {
+                try viewContext.save()
+            } catch {
+                // Replace this implementation with code to handle the error appropriately.
+                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                let nsError = error as NSError
+                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
+        case.timedOut:
+            if newPlant.getImagesCount(with: fsm) > 0{
+                do{
+                    try newPlant.prepareForDeletion(context: viewContext, fsm: fsm)
+                } catch {
+                    print(error)
+                }
+            }
+            viewContext.delete(wateringIvent)
+            viewContext.delete(newPlant)
+            throw SavingError.savingImagesTmeout
         }
     }
+}
+
+enum SavingError: Error{
+    case savingImagesTmeout
+    case wikiDescriptionTimeout
 }

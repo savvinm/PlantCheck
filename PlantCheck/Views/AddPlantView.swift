@@ -14,6 +14,7 @@ struct AddPlantView: View {
     @FocusState var genusFieldIsFocused: Bool
     @ObservedObject var vm = PlantAddingViewModel()
     @State var isSaving = false
+    @State var isShowingAllert = false
     
     var body: some View {
         GeometryReader{ geometry in
@@ -34,11 +35,16 @@ struct AddPlantView: View {
                 }
             }
             .overlay(alignment: .topTrailing){
-                if isSaving{
-                    savingOverlay
-                }
-                else {
-                    closeButton
+                if isShowingAllert{
+                    noConnectionAllert
+                        .transition(AnyTransition.opacity.animation(.easeIn(duration: 0.5)))
+                } else {
+                    if isSaving{
+                        savingOverlay
+                    }
+                    else {
+                        closeButton
+                    }
                 }
             }
             .background{
@@ -64,20 +70,56 @@ struct AddPlantView: View {
         .padding()
     }
     
+    private var noConnectionAllert: some View{
+        GeometryReader{ geometry in
+            ZStack(alignment: .center){
+                Rectangle()
+                    .background(.thickMaterial)
+                    .opacity(0)
+
+                VStack{
+                    Image(systemName: "wifi.slash")
+                        .padding(.bottom)
+                        .font(Font.system(size: 40))
+                    Text("No Internet Connection")
+                        .font(.headline)
+                        .padding(.bottom, 1)
+                    Text("Check your connection or try again")
+                        .multilineTextAlignment(.center)
+                }
+                .foregroundColor(Color(red: 0.81, green: 1, blue: 0.78))
+                .frame(width: geometry.size.width * 0.55, height: geometry.size.height * 0.25)
+                .padding(20)
+                .background(Color(.systemGray))
+                .cornerRadius(15)
+                .opacity(0.95)
+            }
+        }
+    }
+    
+    private func showAllert(){
+        isShowingAllert = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5){
+            isShowingAllert = false
+        }
+    }
+    
     private var savingOverlay: some View{
         ZStack(alignment: .center){
             Rectangle()
                 .background(.thickMaterial)
-                .opacity(0.85)
+                .opacity(0.6)
             VStack{
                 Spacer()
                 ProgressView()
+                    .scaleEffect(1.5)
                     .progressViewStyle(CircularProgressViewStyle(tint: Color(red: 0.81, green: 1, blue: 0.78)))
                     .padding()
                 Text("Saving new plant")
                     .foregroundColor(Color(red: 0.81, green: 1, blue: 0.78))
                 Spacer()
             }
+            .font(.headline)
         }
     }
     
@@ -86,7 +128,14 @@ struct AddPlantView: View {
         Button(action: {
             isSaving = true
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)){
-                vm.addPlant(viewContext: viewContext, isPresented: presentationMode)
+                do{
+                    try vm.savePlant(viewContext: viewContext)
+                    presentationMode.wrappedValue.dismiss()
+                } catch {
+                    print(error)
+                    showAllert()
+                    isSaving = false
+                }
             }
         }, label: {
             HStack{
