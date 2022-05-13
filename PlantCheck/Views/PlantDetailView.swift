@@ -11,8 +11,11 @@ struct PlantDetailView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    let plant: Plant
-    let fsm: FileSystemManager
+    @ObservedObject var plant: Plant
+    let fileSystemManager: FileSystemManager
+    let coreDataController: CoreDataController
+    let isInSheet: Bool
+    
     @State var isShowingAlert = false
     @State var isShowingDescription = false
     @State var isShowingWateringLog = false
@@ -20,61 +23,39 @@ struct PlantDetailView: View {
     var body: some View {
         GeometryReader{ geometry in
             ScrollView{
-                imageScroll(for: plant.getImages(with: fsm), in: geometry)
+                imageScroll(for: plant.getImages(with: fileSystemManager), in: geometry)
                 VStack{
                     titleSection
-                    //Divider()
                     toolBar
                         .frame(width: geometry.size.width * 0.9, height: geometry.size.height * 0.15)
-                    //Divider()
                     if plant.location != nil{
                         VStack{
-                            //Divider()
                             plantSection(title: "Location", value: plant.location!, imageName: "location.fill")
-                            //Divider()
                         }
                         .padding(.top)
                     }
-                    VStack{
-                        //Divider()
-                        plantSection(title: "Watering schedule", value: plant.stringWateringInterval ?? "", imageName: "calendar")
-                        //Divider()
-                    }
-                    .padding(.top)
-                    VStack{
-                        //Divider()
-                        plantSection(title: "Next watering", value: plant._nextWatering, imageName: "calendar")
-                        //Divider()
-                    }
-                    .padding(.top)
-                    VStack{
-                        //Divider()
-                        plantSection(title: "Last watered", value: plant._lastWatered, imageName: "calendar")
-                        //Divider()
-                    }
-                    .padding(.top)
+                    wateringInfo
+                        .padding(.bottom, 30)
                 }
                 .padding(.top, 5)
-                .padding([.horizontal, .bottom])
+                .padding(.horizontal)
             }
             .ignoresSafeArea(edges: .top)
             .sheet(isPresented: $isShowingWateringLog, content: { HistoryView(plant: plant) })
             .sheet(isPresented: $isShowingDescription, content: { WikiDescriptionView(plant: plant) })
-            .overlay(alignment: .topLeading){
-                HStack{
-                    backButton
-                    Spacer()
-                    deleteButton
+            .overlay(alignment: .topTrailing){
+                if isInSheet{
+                    CloseButton(presentationMode: presentationMode)
+                } else {
+                    HStack{
+                        backButton
+                        Spacer()
+                        deleteButton
+                    }
                 }
             }
             .navigationBarHidden(true)
-            .background{
-                Image("background")
-                    .resizable()
-                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                    .ignoresSafeArea(edges: .all)
-                    .opacity(0.25)
-            }
+            .modifier(ImageBackground(geometry: isInSheet ? geometry : nil))
         }
     }
     
@@ -100,29 +81,51 @@ struct PlantDetailView: View {
             HStack{
                 Spacer()
                 Button(action: { waterPlant() }){
-                    icon(title: "Water", imageName: "drop.fill")
-                        .padding()
+                    if plant.canBeWatered{
+                        icon(title: "Water", imageName: "drop")
+                    }
+                    else{
+                        icon(title: "Water", imageName: "drop.fill")
+                    }
                 }
+                .padding()
+                .disabled(!plant.canBeWatered)
                 Button(action: { isShowingWateringLog = true }){
-                    icon(title: "History", imageName: "archivebox.fill")
-                        .padding()
+                    if plant.hasWateringIvents{
+                        icon(title: "History", imageName: "archivebox.fill")
+                    }
+                    else {
+                        icon(title: "History", imageName: "archivebox")
+                    }
                 }
-                .disabled(plant.wateringIvents == nil)
+                .padding()
+                .disabled(!plant.hasWateringIvents)
                 Spacer()
             }
         }
     }
     
+    private var wateringInfo: some View{
+        VStack{
+            plantSection(title: "Watering schedule", value: plant.stringWateringInterval ?? "", imageName: "calendar")
+            VStack{
+                plantSection(title: "Next watering", value: plant._nextWatering, imageName: "calendar.badge.clock")
+                if !plant.hasWateringIvents{
+                    Text("Water your plant to update information")
+                        .multilineTextAlignment(.center)
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .padding(.top)
+        }
+        .padding(.top)
+    }
+    
+    
     private func waterPlant(){
-        let wateringIvent = WateringIvent(context: viewContext)
-        wateringIvent.plant = plant
-        wateringIvent.date = Date()
-        plant.water()
-        do{
-            try viewContext.save()
-        } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        if plant.canBeWatered{
+            coreDataController.water(plant, context: viewContext)
         }
     }
     
@@ -213,7 +216,7 @@ struct PlantDetailView: View {
             ZStack(alignment: .center){
                 RoundedRectangle(cornerRadius: 10)
                     .foregroundColor(.secondary)
-                    .frame(width: 30, height: 30)
+                    .frame(width: 35, height: 35)
                     .opacity(0.6)
                 Image(systemName: "arrow.backward")
                 .foregroundColor(.white)
@@ -228,7 +231,7 @@ struct PlantDetailView: View {
             ZStack(alignment: .center){
                 RoundedRectangle(cornerRadius: 10)
                     .foregroundColor(.secondary)
-                    .frame(width: 30, height: 30)
+                    .frame(width: 35, height: 35)
                     .opacity(0.6)
                 Image(systemName: "trash.fill")
                     .foregroundColor(.white)
@@ -245,21 +248,11 @@ struct PlantDetailView: View {
     }
     
     private func deletePlant(){
-        if plant.getImagesCount(with: fsm) > 0{
-            do{
-                try plant.prepareForDeletion(context: viewContext, fsm: fsm)
-            } catch {
-                print(error)
-                return
-            }
-        }
-        viewContext.delete(plant)
-        do{
-            try viewContext.save()
+        do {
+            try coreDataController.delete(plant, context: viewContext, fsm: fileSystemManager)
             presentationMode.wrappedValue.dismiss()
         } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            print(error)
         }
     }
 }

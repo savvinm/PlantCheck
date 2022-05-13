@@ -30,9 +30,9 @@ final class WikiParser{
         return plants
     }
     
-    func parseDescription(from query: WikiPageRevisionModel) -> String?{
+    func parseBlock(from query: WikiPageRevisionModel, title: String) -> String?{
         if let text = query.query.pages.first?.revisions.first?.slots.main.content{
-            if let description = getParagraph(in: text, title: "Description"){
+            if let description = getParagraph(in: text, title: title){
                 return clearParagraph(paragraph: description)
             }
         }
@@ -40,18 +40,44 @@ final class WikiParser{
     }
     
     
+    func parseDescription(from query: WikiPageRevisionModel) -> String?{
+        guard
+            let text = query.query.pages.first?.revisions.first?.slots.main.content,
+            let title = query.query.pages.first?.title
+        else {
+            return nil
+        }
+        var parts = text.components(separatedBy: "'''\(title)")
+        guard parts.count > 1 else {
+            return nil
+        }
+        parts.remove(at: 0)
+        var tmp = title
+        tmp += removeFirstTranscription(text: parts.joined(separator: ""))
+        parts = tmp.components(separatedBy: "==")
+        guard let description = parts.first else {
+            return nil
+        }
+        let res = clearParagraph(paragraph: description)
+        return res.replacingOccurrences(of: "\n\n\n", with: "\n\n")
+        
+    }
+    
     private func getParagraph(in text: String, title: String) -> String?{
         guard text.contains(title) else {
             return nil
         }
-        let parts = text.components(separatedBy: "==")
-        guard let startIndex = parts.firstIndex(where: { $0.contains(title) }) else {
+        let parts1 = text.components(separatedBy: "== \(title)")
+        let parts2 = text.components(separatedBy: "==\(title)")
+        guard parts1.count == 2 || parts2.count == 2 else {
             return nil
         }
+        var parts = parts1.count == 2 ? parts1 : parts2
         var res = ""
-        if startIndex + 1 < parts.count{
-            res += parts[startIndex + 1]
-            for index in startIndex + 2..<parts.count{
+        parts = parts[1].components(separatedBy: "==")
+        if parts.count > 1{
+            res += parts[1]
+            for index in 2..<parts.count{
                 if parts[index].first == "="{
                     res += parts[index]
                 } else {
@@ -66,9 +92,25 @@ final class WikiParser{
         var res = paragraph.replacingOccurrences(of: "\'\'", with: "")
         res = res.replacingOccurrences(of: "\"", with: "")
         res = res.replacingOccurrences(of: "\'", with: "")
+        res = res.replacingOccurrences(of: "&nbsp;", with: " ")
         res = handleLinks(text: res)
         res = handleHyperLinksAndFiles(text: res)
         res = handleConvertions(text: res)
+        return res
+    }
+    
+    private func removeFirstTranscription(text: String) -> String{
+        let stringArray = Array(text)
+        guard
+            let startIndex = stringArray.firstIndex(of: "("),
+            startIndex < 7,
+            let endIndex = stringArray.firstIndex(of: ")")
+        else {
+            return text
+        }
+        var res = ""
+        res += String(stringArray[0..<startIndex])
+        res += String(stringArray[endIndex + 1..<stringArray.endIndex])
         return res
     }
     
@@ -90,6 +132,9 @@ final class WikiParser{
     private func handleConvertion(convertion: String) -> String{
         let parts = convertion.components(separatedBy: "|")
         if parts.count < 3{
+            return ""
+        }
+        if parts.first?.lowercased() != "convert"{
             return ""
         }
         if parts[2] == "-"{
@@ -142,7 +187,8 @@ final class WikiParser{
         else {
             return ""
         }
-        let parts = text.components(separatedBy: "|")
+        let tmp = text.replacingOccurrences(of: "[", with: "").replacingOccurrences(of: "]", with: "")
+        let parts = tmp.components(separatedBy: "|")
         if parts.count == 2{
             return parts[1]
         } else {
@@ -152,26 +198,34 @@ final class WikiParser{
     
     
     private func handleHyperLinksAndFiles(text: String) -> String{
+        let stringArray = Array(text)
         var res = ""
-        let parts = text.components(separatedBy: "[[")
-        var index = 0
-        while index < parts.count{
-            // case [[File: .... [[hyperlink]]]]
-            if index + 1 < parts.count && parts[index + 1].contains("]]]]"){
-                let smallParts = parts[index + 1].components(separatedBy: "]]]]")
-                res += smallParts[1]
-                res += handleLinkOrFile(text: parts[index] + smallParts[0])
-                index += 2
-            } else {
-                let smallParts = parts[index].components(separatedBy: "]]")
-                if smallParts.count == 1{
-                    res += smallParts.first!
-                } else {
-                    res += handleLinkOrFile(text: smallParts[0])
-                    res += smallParts[1]
+        var openBracetCount = 0
+        var closeBracetCount = 0
+        var openIndex = 0
+        var closeIndex = 0
+        for index in stringArray.indices{
+            if stringArray[index] == "["{
+                openBracetCount += 1
+                if openBracetCount == 1{
+                    openIndex = index
+                    res += stringArray[0..<index]
                 }
-                index += 1
             }
+            if stringArray[index] == "]"{
+                closeBracetCount += 1
+                if closeBracetCount == openBracetCount {
+                    closeIndex = index
+                    res += handleLinkOrFile(text: String(stringArray[openIndex...closeIndex]))
+                    if index + 1 < stringArray.endIndex{
+                        res += handleHyperLinksAndFiles(text: String(stringArray[index + 1..<stringArray.endIndex]))
+                        break
+                    }
+                }
+            }
+        }
+        if openBracetCount == closeBracetCount && openBracetCount == 0{
+            res += text
         }
         return res
     }

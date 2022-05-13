@@ -27,6 +27,10 @@
 		B56E70B72821B5A1007A2626 /* WikiImageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56E70B62821B5A1007A2626 /* WikiImageModel.swift */; };
 		B576C2DE281EFE8000A05A5A /* AddPlantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B576C2DD281EFE8000A05A5A /* AddPlantView.swift */; };
 		B576C2E0281F2D0100A05A5A /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B576C2DF281F2D0100A05A5A /* ImagePicker.swift */; };
+		B578BF68282C1566006D2A28 /* Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = B578BF67282C1566006D2A28 /* Shared.swift */; };
+		B578BF6A282C602F006D2A28 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B578BF69282C602F006D2A28 /* SplashScreen.storyboard */; };
+		B578BF6C282D767A006D2A28 /* TodayWateringScroll.swift in Sources */ = {isa = PBXBuildFile; fileRef = B578BF6B282D767A006D2A28 /* TodayWateringScroll.swift */; };
+		B578BF6E282DADB4006D2A28 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B578BF6D282DADB4006D2A28 /* CoreDataController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +55,10 @@
 		B56E70B62821B5A1007A2626 /* WikiImageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiImageModel.swift; sourceTree = "<group>"; };
 		B576C2DD281EFE8000A05A5A /* AddPlantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPlantView.swift; sourceTree = "<group>"; };
 		B576C2DF281F2D0100A05A5A /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		B578BF67282C1566006D2A28 /* Shared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared.swift; sourceTree = "<group>"; };
+		B578BF69282C602F006D2A28 /* SplashScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SplashScreen.storyboard; sourceTree = "<group>"; };
+		B578BF6B282D767A006D2A28 /* TodayWateringScroll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayWateringScroll.swift; sourceTree = "<group>"; };
+		B578BF6D282DADB4006D2A28 /* CoreDataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +101,8 @@
 				B56E70BA2821E09F007A2626 /* Views */,
 				B56E70B328218C9E007A2626 /* WikiAPI */,
 				B54C32322824761200D58A27 /* Plant.swift */,
+				B578BF69282C602F006D2A28 /* SplashScreen.storyboard */,
+				B578BF6D282DADB4006D2A28 /* CoreDataController.swift */,
 			);
 			path = PlantCheck;
 			sourceTree = "<group>";
@@ -125,6 +135,8 @@
 				B54C323628297B4200D58A27 /* PlantDetailView.swift */,
 				B54C3238282AACD400D58A27 /* WikiDescriptionView.swift */,
 				B54C323A282B02E700D58A27 /* HistoryView.swift */,
+				B578BF67282C1566006D2A28 /* Shared.swift */,
+				B578BF6B282D767A006D2A28 /* TodayWateringScroll.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -198,6 +210,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B54C233F281C059500DDA412 /* Preview Assets.xcassets in Resources */,
+				B578BF6A282C602F006D2A28 /* SplashScreen.storyboard in Resources */,
 				B54C233C281C059500DDA412 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -214,6 +227,7 @@
 				B54C2341281C059500DDA412 /* Persistence.swift in Sources */,
 				B54C233A281C059300DDA412 /* HomeView.swift in Sources */,
 				B54C322E2822694B00D58A27 /* ImagePickerView.swift in Sources */,
+				B578BF68282C1566006D2A28 /* Shared.swift in Sources */,
 				B54C323528252ABC00D58A27 /* FileSystemManager.swift in Sources */,
 				B56E70AE282153DD007A2626 /* PlantAddingViewModel.swift in Sources */,
 				B54C323B282B02E700D58A27 /* HistoryView.swift in Sources */,
@@ -225,6 +239,8 @@
 				B54C32332824761200D58A27 /* Plant.swift in Sources */,
 				B54C323728297B4200D58A27 /* PlantDetailView.swift in Sources */,
 				B56E70B228217F56007A2626 /* APIService.swift in Sources */,
+				B578BF6E282DADB4006D2A28 /* CoreDataController.swift in Sources */,
+				B578BF6C282D767A006D2A28 /* TodayWateringScroll.swift in Sources */,
 				B56E70B028216AAA007A2626 /* WikiPageRevisionModel.swift in Sources */,
 				B54C3239282AACD500D58A27 /* WikiDescriptionView.swift in Sources */,
 			);
@@ -362,6 +378,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = SplashScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
@@ -394,6 +411,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = SplashScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;

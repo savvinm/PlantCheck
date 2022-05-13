@@ -18,13 +18,17 @@ extension Plant{
         guard let ivents = wateringIvents as? Set<WateringIvent> else {
             return []
         }
+        var dates = [Date]()
+        for ivent in ivents{
+            dates.append(ivent.date!)
+        }
         var res = [String]()
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "d MMMM yyyy, HH:mm:ss"
-        for ivent in ivents{
-            res.append(dateFormatter.string(from: ivent.date!))
+        for date in dates.sorted(){
+            res.append(dateFormatter.string(from: date))
         }
-        return res
+        return res.reversed()
     }
     
     var _nextWatering: String{
@@ -43,7 +47,7 @@ extension Plant{
         return dateFormatter.string(from: nextWatering)
     }
     
-    var _lastWatered: String{
+    /*var _lastWatered: String{
         guard let lastWatering = lastWatering else {
             return ""
         }
@@ -57,11 +61,43 @@ extension Plant{
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "EEEE, MMMM dd"
         return dateFormatter.string(from: lastWatering)
+    }*/
+    
+    /*var isWateringDateToday: Bool{
+        guard let nextWatering = nextWatering else {
+            return true
+        }
+        let calendar = Calendar.current
+        if calendar.isDateInToday(nextWatering){
+            return true
+        }
+        return false
+    }*/
+    
+    var hasWateringIvents: Bool{
+        if let ivents = wateringIvents as? Set<WateringIvent>{
+            if ivents.count > 0{
+                return true
+            }
+        }
+        return false
+    }
+    
+    var canBeWatered: Bool{
+        guard let lastWatering = lastWatering else {
+            return true
+        }
+        let calendar = Calendar.current
+        if calendar.isDateInToday(lastWatering){
+            return false
+        }
+        return true
     }
     
     func water(){
         lastWatering = Date()
         nextWatering = Date() + Double(wateringInterval) * 86400
+        objectWillChange.send()
     }
     
     func getImages(with fsm: FileSystemManager) -> [UIImage]?{
@@ -106,7 +142,7 @@ extension Plant{
     
     private func deleteImagesFromStorage(with fsm: FileSystemManager) throws {
         guard let paths = imagesPath?.components(separatedBy: "%20") else {
-            throw PlantError.imagesDeletingError
+            return
         }
         var newPaths = [String]()
         for path in paths {
@@ -123,11 +159,11 @@ extension Plant{
         }
     }
     
-    func getDescriptionPair() -> (dictionary: [String: String], titles: [String])?{
-        guard let description = self.wikiDescription else {
+    func getCultivationPair() -> (dictionary: [String: String], titles: [String])?{
+        guard let cultivation = wikiCultivation else {
             return nil
         }
-        return parseParagraph(description)
+        return parseParagraph(cultivation)
     }
     
     private func parseParagraph(_ text: String) -> ([String: String], [String]){
@@ -140,7 +176,7 @@ extension Plant{
         for index in parts.indices{
             if parts[index].first == "=" && parts[index].last == "="{
                 if tmp != "" && tmp != "\n"{
-                    res[title] = tmp
+                    res[title] = tmp.trimmingCharacters(in: .whitespacesAndNewlines)
                     titles.append(title)
                     tmp = ""
                 }
@@ -150,7 +186,7 @@ extension Plant{
             }
         }
         if tmp != "" && tmp != "\n"{
-            res[title] = tmp
+            res[title] = tmp.trimmingCharacters(in: .whitespacesAndNewlines)
             titles.append(title)
         }
         return (res, titles)

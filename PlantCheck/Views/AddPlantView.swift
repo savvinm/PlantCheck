@@ -27,13 +27,14 @@ struct AddPlantView: View {
                     wateringInformation
                     saveButton
                 }
-                .frame(width: geometry.size.width * 0.9)
+                .padding(.horizontal)
                 .padding(.bottom, 50)
                 .padding(.top)
                 .onTapGesture {
                     genusFieldIsFocused = false
                 }
             }
+            .modifier(ImageBackground(geometry: geometry))
             .overlay(alignment: .topTrailing){
                 if isShowingAllert{
                     noConnectionAllert
@@ -43,31 +44,11 @@ struct AddPlantView: View {
                         savingOverlay
                     }
                     else {
-                        closeButton
+                        CloseButton(presentationMode: presentationMode)
                     }
                 }
             }
-            .background{
-                Image("background")
-                    .resizable()
-                    .ignoresSafeArea(.keyboard)
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                    .ignoresSafeArea(edges: .all)
-                    .opacity(0.25)
-            }
         }
-    }
-    
-    private var closeButton: some View{
-        Button(action: {
-            presentationMode.wrappedValue.dismiss()
-        }, label: {
-            Image(systemName: "x.circle.fill")
-                .font(.system(size: 25))
-                .foregroundColor(.secondary)
-                .opacity(0.95)
-        })
-        .padding()
     }
     
     private var noConnectionAllert: some View{
@@ -112,7 +93,7 @@ struct AddPlantView: View {
             VStack{
                 Spacer()
                 ProgressView()
-                    .scaleEffect(1.5)
+                    .scaleEffect(1.2)
                     .progressViewStyle(CircularProgressViewStyle(tint: Color(red: 0.81, green: 1, blue: 0.78)))
                     .padding()
                 Text("Saving new plant")
@@ -155,19 +136,9 @@ struct AddPlantView: View {
         VStack(alignment: .leading){
             Text("Watering schedual").font(.headline)
             MenuPicker(selection: vm.wateringInterval, vm: vm)
-            footnoteView(for: "Select a suitable watering interval for your plant. You will see which plants need to be watered on the main screen")
+            FootnoteView(text: "Select a suitable watering interval for your plant. You will see which plants need to be watered on the main screen")
         }
         .padding(.bottom)
-    }
-    
-    private func footnoteView(for text: String) -> some View{
-        HStack{
-            Text(text)
-                .multilineTextAlignment(.leading)
-                .font(.footnote)
-                .foregroundColor(.secondary)
-            Spacer()
-        }
     }
     
     private var nameAndLocationFields: some View{
@@ -183,7 +154,7 @@ struct AddPlantView: View {
                             })
                         }
                     }
-                footnoteView(for: "You can name your new plant to distinguish it from other plants of the same kind")
+                FootnoteView(text: "You can name your new plant to distinguish it from other plants of the same kind")
             }
             VStack{
                 TextField("Location (optional)", text: $vm.location)
@@ -195,7 +166,7 @@ struct AddPlantView: View {
                             })
                         }
                     }
-                footnoteView(for: "Write where your new plant lives, for example, by the window in the kitchen")
+                FootnoteView(text: "Write where your new plant lives, for example, by the window in the kitchen")
             }
             .padding(.top)
         }
@@ -249,59 +220,6 @@ struct AddPlantView: View {
             .background(.thickMaterial)
             .cornerRadius(10)
         }
-    }
-}
-
-
-private struct MenuPicker: View{
-    @State var selection: Int
-    @ObservedObject var vm: PlantAddingViewModel
-    var body: some View{
-        VStack{
-            Menu{
-                pickerBody
-            } label: {
-                pickerLabel
-            }
-        }
-    }
-    
-    private var pickerBody: some View{
-        Picker("Intervals", selection: $selection) {
-            ForEach(vm.intervals, id: \.self) { id in
-                Text(vm.wateringIntervals[id]!).tag(id)
-            }
-        }
-        .onChange(of: selection){
-            vm.wateringInterval = $0
-        }
-        .pickerStyle(InlinePickerStyle())
-    }
-    
-    private var pickerLabel: some View{
-        HStack{
-            if vm.wateringInterval == 0{
-                Text("Select")
-            } else {
-                Text(vm.wateringIntervals[selection]!)
-            }
-        }
-        .frame(maxWidth: .infinity, minHeight: 50, maxHeight: 50)
-        .foregroundColor(vm.wateringInterval == 0 ? .secondary : .primary)
-        .font(.headline)
-        .background(.thickMaterial)
-        .cornerRadius(10)
-    }
-}
-
-private struct InputStyle: ViewModifier{
-    func body(content: Content) -> some View{
-        content
-            .font(.headline)
-            .padding(.leading)
-            .frame(maxWidth: .infinity, idealHeight: 50)
-            .background(.thickMaterial)
-            .cornerRadius(10)
     }
 }
 

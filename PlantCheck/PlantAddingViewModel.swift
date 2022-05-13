@@ -190,14 +190,7 @@ class PlantAddingViewModel: ObservableObject{
         newPlant.wateringInterval = Int16(wateringInterval)
         newPlant.stringWateringInterval = wateringIntervals[wateringInterval]
         newPlant.location = location == "" ?  nil : location
-        
-        let wateringIvent = WateringIvent(context: viewContext)
-        wateringIvent.date = Date()
-        wateringIvent.plant = newPlant
-        
         newPlant.creationDate = Date()
-        newPlant.lastWatering = Date()
-        newPlant.nextWatering = Date() + Double(wateringInterval) * 86400
         
         let group = DispatchGroup()
         group.enter()
@@ -205,6 +198,7 @@ class PlantAddingViewModel: ObservableObject{
             switch result{
             case.success(let query):
                 newPlant.wikiDescription = self.parser.parseDescription(from: query)
+                newPlant.wikiCultivation = self.parser.parseBlock(from: query, title: "Cultivation")
                 group.leave()
             case.failure(let error):
                 print(error)
@@ -261,7 +255,6 @@ class PlantAddingViewModel: ObservableObject{
                     print(error)
                 }
             }
-            viewContext.delete(wateringIvent)
             viewContext.delete(newPlant)
             throw SavingError.savingImagesTmeout
         }
