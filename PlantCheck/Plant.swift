@@ -47,22 +47,6 @@ extension Plant{
         return dateFormatter.string(from: nextWatering)
     }
     
-    /*var _lastWatered: String{
-        guard let lastWatering = lastWatering else {
-            return ""
-        }
-        let calendar = Calendar.current
-        if calendar.isDateInToday(lastWatering){
-            return "Today"
-        }
-        if calendar.isDateInYesterday(lastWatering){
-            return "Yestrday"
-        }
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "EEEE, MMMM dd"
-        return dateFormatter.string(from: lastWatering)
-    }*/
-    
     /*var isWateringDateToday: Bool{
         guard let nextWatering = nextWatering else {
             return true

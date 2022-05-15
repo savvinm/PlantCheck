@@ -12,11 +12,6 @@ class CoreDataController{
     var selectedPlant: Plant?
     
     func delete(_ plant: Plant, context: NSManagedObjectContext, fsm: FileSystemManager) throws {
-        /*do{
-            try plant.prepareForDeletion(context: context, fsm: fsm)
-        } catch {
-            throw error
-        }*/
         try plant.prepareForDeletion(context: context, fsm: fsm)
         context.delete(plant)
         do{

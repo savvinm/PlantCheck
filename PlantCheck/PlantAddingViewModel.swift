@@ -66,7 +66,10 @@ class PlantAddingViewModel: ObservableObject{
     }
     
     private func start(){
-        api.fetchPageFromWiki(pageTitle: "Houseplant"){ result in
+        api.fetchPageFromWiki(pageTitle: "Houseplant"){ [weak self] result in
+            guard let self = self else {
+                return
+            }
             switch result {
             case .success(let query):
                 self.genuses = self.parser.parseListOfPlants(from: query)
@@ -82,7 +85,7 @@ class PlantAddingViewModel: ObservableObject{
             updateWikiImage()
             return
         }
-        DispatchQueue.main.async { [ weak self ] in
+        DispatchQueue.main.async { [weak self] in
             self?.objectWillChange.send()
         }
     }
@@ -90,7 +93,10 @@ class PlantAddingViewModel: ObservableObject{
     private func updateWikiImage(){
         imageURL = nil
         if imageCount == 0 && checkGenus(){
-            api.fetchImagesFromWiki(pageTitles: [genus], pithumbsize: 1000) { result in
+            api.fetchImagesFromWiki(pageTitles: [genus], pithumbsize: 1000) { [weak self] result in
+                guard let self = self else {
+                    return
+                }
                 switch result {
                 case .success(let query):
                     guard
@@ -101,7 +107,7 @@ class PlantAddingViewModel: ObservableObject{
                     else {
                         return
                     }
-                    DispatchQueue.main.async { [ weak self ] in
+                    DispatchQueue.main.async { [weak self] in
                         guard let self = self else {
                             return
                         }
@@ -139,7 +145,7 @@ class PlantAddingViewModel: ObservableObject{
         if titles.count > limit{
             fetchThumbnails(withLimit: limit, for: Array(titles.suffix(titles.count - limit)))
         }
-        api.fetchImagesFromWiki(pageTitles: Array(titles.prefix(limit)) , pithumbsize: 100){ result in
+        api.fetchImagesFromWiki(pageTitles: Array(titles.prefix(limit)) , pithumbsize: 100){ [weak self] result in
             switch result{
             case .success(let query):
                 for item in query.query.pages{
@@ -150,7 +156,7 @@ class PlantAddingViewModel: ObservableObject{
                         print("Wrong URL format")
                         continue
                     }
-                    self.thumbnails[item.title] = url
+                    self?.thumbnails[item.title] = url
                 }
             case .failure(let error):
                 print(error)
@@ -194,7 +200,10 @@ class PlantAddingViewModel: ObservableObject{
         
         let group = DispatchGroup()
         group.enter()
-        api.fetchPageFromWiki(pageTitle: genus){ result in
+        api.fetchPageFromWiki(pageTitle: genus){ [weak self] result in
+            guard let self = self else {
+                return
+            }
             switch result{
             case.success(let query):
                 newPlant.wikiDescription = self.parser.parseDescription(from: query)
@@ -212,7 +221,10 @@ class PlantAddingViewModel: ObservableObject{
         
         group.enter()
         if imageCount == 0 && imageURL != nil{
-            api.downloadImage(from: imageURL!){ result in
+            api.downloadImage(from: imageURL!){ [weak self] result in
+                guard let self = self else {
+                    return
+                }
                 switch result{
                 case.success(let image):
                     self.images.append(image)

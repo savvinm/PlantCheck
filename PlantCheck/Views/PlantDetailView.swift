@@ -57,6 +57,7 @@ struct PlantDetailView: View {
             .navigationBarHidden(true)
             .modifier(ImageBackground(geometry: isInSheet ? geometry : nil))
         }
+        .ignoresSafeArea(edges: .bottom)
     }
     
     private func icon(title: String?, imageName: String) -> some View{
@@ -81,22 +82,12 @@ struct PlantDetailView: View {
             HStack{
                 Spacer()
                 Button(action: { waterPlant() }){
-                    if plant.canBeWatered{
-                        icon(title: "Water", imageName: "drop")
-                    }
-                    else{
-                        icon(title: "Water", imageName: "drop.fill")
-                    }
+                    icon(title: "Water", imageName: plant.canBeWatered ? "drop" : "drop.fill")
                 }
                 .padding()
                 .disabled(!plant.canBeWatered)
                 Button(action: { isShowingWateringLog = true }){
-                    if plant.hasWateringIvents{
-                        icon(title: "History", imageName: "archivebox.fill")
-                    }
-                    else {
-                        icon(title: "History", imageName: "archivebox")
-                    }
+                    icon(title: "History", imageName: plant.hasWateringIvents ? "archivebox.fill" : "archivebox")
                 }
                 .padding()
                 .disabled(!plant.hasWateringIvents)

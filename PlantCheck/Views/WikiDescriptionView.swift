@@ -17,44 +17,56 @@ struct WikiDescriptionView: View {
                 VStack{
                     Text("Plant description from Wikipedia")
                         .font(.headline)
-                        .padding(5)
-                    if plant.wikiDescription != nil{
-                        VStack(alignment: .leading){
-                            Text(plant.wikiDescription!)
-                                .font(.callout)
-                        }
-                    }
-                    if
-                        let pair = plant.getCultivationPair(),
-                        let titles = pair.titles,
-                        let dictionary = pair.dictionary
-                    {
-                        VStack(alignment: .leading){
-                            Text("Cultivation")
-                                .font(.headline)
-                                .padding(.vertical, 5)
-                            VStack(alignment: .leading){
-                                if titles.contains("body"){
-                                    Text(dictionary["body"]!)
-                                        .font(.callout)
-                                }
-                                ForEach(titles, id: \.self){ title in
-                                    if title != "body"{
-                                        Text("\n\(title)")
-                                            .font(.headline)
-                                        Text(dictionary[title]!)
-                                            .font(.callout)
-                                    }
-                                }
-                            }
-                        }
-                    }
+                        .padding(10)
+                    descriptionBlock
+                    cultivationBlock
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 20)
             }
             .overlay(alignment: .topTrailing, content: { CloseButton(presentationMode: presentationMode) })
             .modifier(ImageBackground(geometry: geometry))
+        }
+        .ignoresSafeArea(edges: .bottom)
+    }
+    
+    private var descriptionBlock: some View{
+        VStack{
+            if plant.wikiDescription != nil{
+                VStack(alignment: .leading){
+                    Text(plant.wikiDescription!)
+                        .font(.callout)
+                }
+            }
+        }
+    }
+    
+    private var cultivationBlock: some View{
+        VStack{
+            if
+                let pair = plant.getCultivationPair(),
+                let titles = pair.titles,
+                let dictionary = pair.dictionary
+            {
+                VStack(alignment: .leading){
+                    Text("Cultivation")
+                        .font(.headline)
+                    VStack(alignment: .leading){
+                        if titles.contains("body"){
+                            Text(dictionary["body"]!)
+                                .font(.callout)
+                        }
+                        ForEach(titles, id: \.self){ title in
+                            if title != "body"{
+                                Text("\n\(title)")
+                                    .font(.headline)
+                                Text(dictionary[title]!)
+                                    .font(.callout)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

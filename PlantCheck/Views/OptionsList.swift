@@ -67,7 +67,6 @@ struct OptionsList: View{
                 Image("default")
                     .resizable()
                     .scaledToFill()
-                    .clipped()
             }
         }
     }

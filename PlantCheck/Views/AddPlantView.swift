@@ -20,7 +20,6 @@ struct AddPlantView: View {
         GeometryReader{ geometry in
             ScrollView(showsIndicators: false){
                 ImagePikcerView(vm: vm)
-                    .frame(maxWidth: geometry.size.width)
                 VStack{
                     genusSelector
                     nameAndLocationFields
@@ -35,17 +34,22 @@ struct AddPlantView: View {
                 }
             }
             .modifier(ImageBackground(geometry: geometry))
-            .overlay(alignment: .topTrailing){
-                if isShowingAllert{
-                    noConnectionAllert
-                        .transition(AnyTransition.opacity.animation(.easeIn(duration: 0.5)))
-                } else {
-                    if isSaving{
-                        savingOverlay
-                    }
-                    else {
-                        CloseButton(presentationMode: presentationMode)
-                    }
+            .overlay(alignment: .topTrailing){ pageOverlay }
+        }
+        .ignoresSafeArea(.container, edges: .bottom)
+    }
+    
+    private var pageOverlay: some View{
+        VStack{
+            if isShowingAllert{
+                noConnectionAllert
+                    .transition(AnyTransition.opacity.animation(.easeIn(duration: 0.5)))
+            } else {
+                if isSaving{
+                    savingOverlay
+                }
+                else {
+                    CloseButton(presentationMode: presentationMode)
                 }
             }
         }
@@ -57,7 +61,6 @@ struct AddPlantView: View {
                 Rectangle()
                     .background(.thickMaterial)
                     .opacity(0)
-
                 VStack{
                     Image(systemName: "wifi.slash")
                         .padding(.bottom)
@@ -192,11 +195,7 @@ struct AddPlantView: View {
                     TextField("Search", text: $vm.genus, onEditingChanged: {
                         (isBegin) in
                         withAnimation(.easeInOut){
-                            if isBegin{
-                                vm.genusIsFocused = true
-                            } else {
-                                vm.genusIsFocused = false
-                            }
+                            vm.genusIsFocused = isBegin
                         }
                     })
                     .disableAutocorrection(true)
@@ -212,7 +211,6 @@ struct AddPlantView: View {
                 }
                 .padding(.leading)
                 .font(.headline)
-                
                 if vm.genusIsFocused && vm.genus != ""{
                     OptionsList(vm: vm, genusFieldIsFocused: _genusFieldIsFocused)
                 }

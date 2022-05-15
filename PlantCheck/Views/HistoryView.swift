@@ -32,6 +32,7 @@ struct HistoryView: View {
             .overlay(alignment: .topTrailing, content: { CloseButton(presentationMode: presentationMode) })
             .modifier(ImageBackground(geometry: geometry))
         }
+        .ignoresSafeArea(edges: .bottom)
     }
 }
 

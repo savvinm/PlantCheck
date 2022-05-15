@@ -14,16 +14,12 @@ struct ImagePikcerView: View{
         VStack{
             if vm.images.isEmpty{
                 if vm.imageURL == nil{
-                    ZStack{
-                        defaultImage
-                        photoIcon
-                    }
-                    .padding(.bottom)
+                    defaultImage.padding(.bottom)
                 } else {
                     wikiImage.padding(.bottom)
                 }
             } else {
-                ScrollView(.horizontal, showsIndicators: false, content: {
+                ScrollView(.horizontal, showsIndicators: false){
                     HStack{
                         ForEach(vm.images, id : \.self){ img in
                             VStack{
@@ -32,7 +28,7 @@ struct ImagePikcerView: View{
                             }
                         }
                     }
-                })
+                }
             }
         }
         .onTapGesture {
@@ -60,20 +56,7 @@ struct ImagePikcerView: View{
                 .aspectRatio(contentMode: .fill)
                 .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.35)
                 .clipped()
-            HStack{
-                Spacer()
-                VStack{
-                    Spacer()
-                    Button(action: {
-                        withAnimation(.easeInOut){
-                            vm.removeImage(img)
-                        }
-                    }, label: {
-                        toolIcon(imageName: "trash.fill")
-                    })
-                    .padding([.trailing, .bottom])
-                }
-            }
+            removeButton(for: img)
         }
     }
     
@@ -107,6 +90,23 @@ struct ImagePikcerView: View{
         }
     }
     
+    private func removeButton(for img: UIImage) -> some View{
+        HStack{
+            Spacer()
+            VStack{
+                Spacer()
+                Button(action: {
+                    withAnimation(.easeInOut){
+                        vm.removeImage(img)
+                    }
+                }, label: {
+                    toolIcon(imageName: "trash.fill")
+                })
+                .padding([.trailing, .bottom])
+            }
+        }
+    }
+    
     private var photoIcon: some View{
         HStack{
             Spacer()
@@ -119,8 +119,11 @@ struct ImagePikcerView: View{
     }
     
     private var defaultImage: some View{
-        Image("default")
-            .resizable()
-            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.35)
+        ZStack{
+            Image("default")
+                .resizable()
+                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.35)
+            photoIcon
+        }
     }
 }

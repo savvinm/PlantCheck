@@ -43,8 +43,8 @@ struct ImagePicker: UIViewControllerRepresentable {
             guard !results.isEmpty else {
                 return
             }
-            self.parent.imageCount = results.count
-            self.parent.images = []
+            parent.imageCount = results.count
+            parent.images = []
             for result in results{
                 guard result.itemProvider.canLoadObject(ofClass: UIImage.self) else {
                     print("Error getting image from picker")

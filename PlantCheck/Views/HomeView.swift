@@ -23,81 +23,83 @@ struct HomeView: View {
     var body: some View {
         NavigationView{
             ScrollView{
-                VStack(alignment: .leading){
-                    Text("Water today")
-                        .font(.title)
-                        .fontWeight(Font.Weight.semibold)
-                        .padding(.horizontal)
-                    TodayWateringScroll(fileSystemManager: fileSystemManager, coreDataController: coreDataController, context: viewContext)
-                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.22)
-                        .padding(.bottom)
-                }
-                .padding(.vertical)
-                VStack{
-                    HStack{
-                        Text("Your plants")
-                            .font(.title)
-                            .fontWeight(Font.Weight.semibold)
-                        Button(action: { isAddingSheetPresented = true}){
-                            Image(systemName: "plus.circle.fill")
-                                .foregroundColor(.secondary)
-                                .font(Font.system(size: 20))
-                        }
-                        .padding(.top, -8)
-                        .padding(.leading, -5)
-                        Spacer()
-                    }
-                    if plants.count > 0{
-                        LazyVGrid(columns: [GridItem(), GridItem()], alignment: .center, spacing: 20){
-                            ForEach(plants) { plant in
-                                plantPreview(for: plant)
-                                    .frame(width: UIScreen.main.bounds.width * 0.42, height: UIScreen.main.bounds.width * 0.64)
-                                    .shadow(color: Color(.systemGray4), radius: 5, x: 5, y: 5)
-                            }
-                        }
-                    } else {
-                        Text("No plants here")
-                            .foregroundColor(.secondary)
-                            .font(.headline)
-                            .padding()
-                    }
-                }
-                .padding(.bottom)
-                .padding(.horizontal)
+                todayWateringBlock
+                    .padding(.vertical)
+                plantsBlock
+                    .padding(.bottom)
+                    .padding(.horizontal)
             }
             .padding(.top)
             .modifier(ImageBackground(geometry: nil))
-            .ignoresSafeArea(.keyboard)
             .sheet(isPresented: $isAddingSheetPresented, content: { AddPlantView() })
             .navigationBarHidden(true)
         }
     }
 
+    
+    private var todayWateringBlock: some View{
+        VStack(alignment: .leading){
+            Text("Water today")
+                .font(.title)
+                .fontWeight(Font.Weight.semibold)
+                .padding(.horizontal)
+            TodayWateringScroll(fileSystemManager: fileSystemManager, coreDataController: coreDataController, context: viewContext)
+                .frame(width: UIScreen.main.bounds.width, height: 150)
+                .padding(.bottom)
+        }
+    }
+    
+    private var plantsBlock: some View{
+        VStack{
+            HStack{
+                Text("Your plants")
+                    .font(.title)
+                    .fontWeight(Font.Weight.semibold)
+                Button(action: { isAddingSheetPresented = true}){
+                    Image(systemName: "plus.circle.fill")
+                        .foregroundColor(.secondary)
+                        .font(Font.system(size: 20))
+                }
+                .padding(.top, -8)
+                .padding(.leading, -5)
+                .opacity(0.7)
+                Spacer()
+            }
+            if plants.count > 0{
+                LazyVGrid(columns: [GridItem(), GridItem()], alignment: .center, spacing: 20){
+                    ForEach(plants) { plant in
+                        plantPreview(for: plant)
+                            .frame(width: UIScreen.main.bounds.width * 0.42, height: UIScreen.main.bounds.width * 0.64)
+                            .shadow(color: Color(.systemGray4), radius: 5, x: 5, y: 5)
+                    }
+                }
+            } else {
+                Text("No plants here")
+                    .foregroundColor(.secondary)
+                    .font(.headline)
+                    .padding()
+            }
+        }
+    }
+    
     private func plantPreview(for plant: Plant) -> some View{
         GeometryReader{ geometry in
             NavigationLink(destination: { PlantDetailView(plant: plant, fileSystemManager: fileSystemManager, coreDataController: coreDataController, isInSheet: false) }){
-                ZStack(alignment: .center){
-                        VStack{
-                            if plant.imagesPath == nil{
-                                Image("default")
-                                    .resizable()
-            
-                            } else {
-                                Image(uiImage: (plant.getThumbnail(with: fileSystemManager))!)
-                                    .resizable()
-                            }
-                        }
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        //.clipped()
-                        .overlay(alignment: .bottomLeading){
-                            imageOverlay(for: plant)
-                                .frame(width: geometry.size.width, height: geometry.size.height * 0.3)
-                        }
-                        //.overlay(imageOverlay(for: plant), alignment: .bottomLeading)
-
+                VStack{
+                    if plant.imagesPath == nil{
+                        Image("default")
+                            .resizable()
+                    } else {
+                        Image(uiImage: (plant.getThumbnail(with: fileSystemManager))!)
+                            .resizable()
+                    }
                 }
-                
+                .aspectRatio(contentMode: .fill)
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                .overlay(alignment: .bottomLeading){
+                    imageOverlay(for: plant)
+                        .frame(width: geometry.size.width, height: geometry.size.height * 0.3)
+                }
                 .cornerRadius(15)
             }
         }

@@ -28,36 +28,41 @@ struct TodayWateringScroll: View {
     var body: some View {
         GeometryReader{ geometry in
             if toWater.count > 0 || watered.count > 0{
-                ScrollView(.horizontal, showsIndicators: false){
-                    HStack(alignment: .top, spacing: 10){
-                        if toWater.count > 0{
-                            ForEach(toWater){ plant in
-                                plantView(for: plant)
-                                    .frame(width: geometry.size.width * 0.22, height: geometry.size.height)
-                            }
-                        }
-                        if watered.count > 0{
-                            ForEach(watered){ plant in
-                                plantView(for: plant)
-                                    .frame(width: geometry.size.width * 0.22, height: geometry.size.height)
-                                    .opacity(0.5)
-                            }
-                        }
-                    }
-                    .sheet(isPresented: $isShowingPlantSheet, content: { PlantDetailView(plant: coreDataController.selectedPlant!, fileSystemManager: fileSystemManager, coreDataController: coreDataController, isInSheet: true) })
-                    .buttonStyle(PlainButtonStyle())
-                    .padding(.horizontal)
-                }
+                wateringScrollView(in: geometry)
             } else {
                 HStack{
                     Spacer()
-                    Text("No plants for today watering")
+                    Text("No plants for water today")
                         .foregroundColor(.secondary)
                         .font(.headline)
                         .padding()
                     Spacer()
                 }
             }
+        }
+    }
+    
+    private func wateringScrollView(in geometry: GeometryProxy) -> some View{
+        ScrollView(.horizontal, showsIndicators: false){
+            HStack(alignment: .top, spacing: 10){
+                if toWater.count > 0{
+                    inScrollForEach(for: toWater, in: geometry)
+                }
+                if watered.count > 0{
+                    inScrollForEach(for: watered, in: geometry)
+                        .opacity(0.4)
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+            .padding(.horizontal)
+            .sheet(isPresented: $isShowingPlantSheet, content: { PlantDetailView(plant: coreDataController.selectedPlant!, fileSystemManager: fileSystemManager, coreDataController: coreDataController, isInSheet: true) })
+        }
+    }
+    
+    private func inScrollForEach(for plants: [Plant], in geometry: GeometryProxy) -> some View{
+        ForEach(plants){ plant in
+            plantView(for: plant)
+                .frame(width: geometry.size.width * 0.22, height: geometry.size.width * 0.4)
         }
     }
     
