@@ -32,7 +32,7 @@ struct TodayWateringScroll: View {
             } else {
                 HStack{
                     Spacer()
-                    Text("No plants for water today")
+                    Text("No plants to water today")
                         .foregroundColor(.secondary)
                         .font(.headline)
                         .padding()

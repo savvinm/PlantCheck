@@ -17,14 +17,14 @@ struct WikiDescriptionView: View {
                 VStack{
                     Text("Plant description from Wikipedia")
                         .font(.headline)
-                        .padding(10)
+                        .padding(.bottom, 15)
                     descriptionBlock
                     cultivationBlock
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 20)
             }
-            .overlay(alignment: .topTrailing, content: { CloseButton(presentationMode: presentationMode) })
+            .overlay(alignment: .topTrailing, content: { CloseButton(presentationMode: presentationMode, withBackground: false) })
             .modifier(ImageBackground(geometry: geometry))
         }
         .ignoresSafeArea(edges: .bottom)

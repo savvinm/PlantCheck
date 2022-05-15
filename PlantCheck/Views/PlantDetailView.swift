@@ -45,7 +45,7 @@ struct PlantDetailView: View {
             .sheet(isPresented: $isShowingDescription, content: { WikiDescriptionView(plant: plant) })
             .overlay(alignment: .topTrailing){
                 if isInSheet{
-                    CloseButton(presentationMode: presentationMode)
+                    CloseButton(presentationMode: presentationMode, withBackground: true)
                 } else {
                     HStack{
                         backButton

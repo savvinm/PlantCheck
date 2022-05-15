@@ -52,17 +52,16 @@ struct HomeView: View {
     private var plantsBlock: some View{
         VStack{
             HStack{
-                Text("Your plants")
+                Text("My plants")
                     .font(.title)
                     .fontWeight(Font.Weight.semibold)
                 Button(action: { isAddingSheetPresented = true}){
-                    Image(systemName: "plus.circle.fill")
-                        .foregroundColor(.secondary)
+                    Image(systemName: "plus.rectangle")
+                        .foregroundColor(.primary)
                         .font(Font.system(size: 20))
                 }
-                .padding(.top, -8)
-                .padding(.leading, -5)
-                .opacity(0.7)
+                .padding(.top, 3)
+                .padding(.leading, -3)
                 Spacer()
             }
             if plants.count > 0{
@@ -74,8 +73,9 @@ struct HomeView: View {
                     }
                 }
             } else {
-                Text("No plants here")
+                Text("You don't have any plants yet. Tap \(Image(systemName: "plus.rectangle")) to get started")
                     .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
                     .font(.headline)
                     .padding()
             }

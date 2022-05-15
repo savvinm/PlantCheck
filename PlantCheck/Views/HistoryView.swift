@@ -16,7 +16,7 @@ struct HistoryView: View {
             ScrollView{
                 VStack{
                     Text("Watering history")
-                        .padding()
+                        .padding(.bottom, 15)
                         .font(.headline)
                         ForEach(plant._wateringIvents, id: \.self){ ivent in
                             HStack{
@@ -27,9 +27,10 @@ struct HistoryView: View {
                             }
                         }
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.vertical, 20)
             }
-            .overlay(alignment: .topTrailing, content: { CloseButton(presentationMode: presentationMode) })
+            .overlay(alignment: .topTrailing, content: { CloseButton(presentationMode: presentationMode, withBackground: false) })
             .modifier(ImageBackground(geometry: geometry))
         }
         .ignoresSafeArea(edges: .bottom)

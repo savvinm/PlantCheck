@@ -49,7 +49,7 @@ struct AddPlantView: View {
                     savingOverlay
                 }
                 else {
-                    CloseButton(presentationMode: presentationMode)
+                    CloseButton(presentationMode: presentationMode, withBackground: true)
                 }
             }
         }

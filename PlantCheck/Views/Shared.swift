@@ -22,15 +22,23 @@ struct FootnoteView: View{
 
 struct CloseButton: View{
     @State var presentationMode: Binding<PresentationMode>
+    let withBackground: Bool
     
     var body: some View{
         Button(action: {
             presentationMode.wrappedValue.dismiss()
         }, label: {
-            Image(systemName: "x.circle.fill")
-                .font(.system(size: 25))
-                .foregroundColor(.secondary)
-                .opacity(0.95)
+            ZStack{
+                if withBackground{
+                    RoundedRectangle(cornerRadius: 10)
+                        .foregroundColor(.secondary)
+                        .frame(width: 35, height: 35)
+                        .opacity(0.6)
+                }
+                Image(systemName: "x.circle.fill")
+                    .font(.system(size: 20))
+                    .foregroundColor(withBackground ? .white : .secondary)
+            }
         })
         .padding()
     }
