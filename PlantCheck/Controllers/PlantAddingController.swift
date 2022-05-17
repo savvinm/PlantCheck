@@ -93,42 +93,39 @@ class PlantAddingController: ObservableObject{
     
     private func updateWikiImage(){
         imageURL = nil
-        if imageCount == 0 && checkGenus(){
-            api.fetchImagesFromWiki(pageTitles: [genus], pithumbsize: 1000) { [weak self] result in
-                guard let self = self else {
+        guard imageCount == 0 && checkGenus() else {
+            return
+        }
+        api.fetchImagesFromWiki(pageTitles: [genus], pithumbsize: 1000) { [weak self] result in
+            guard let self = self else {
+                return
+            }
+            switch result {
+            case .success(let query):
+                guard
+                    let page = query.query.pages.first,
+                    self.genus == page.title,
+                    let source = page.thumbnail?.source,
+                    let url = URL(string: source)
+                else {
                     return
                 }
-                switch result {
-                case .success(let query):
-                    guard
-                        let page = query.query.pages.first,
-                        self.genus == page.title,
-                        let source = page.thumbnail?.source,
-                        let url = URL(string: source)
-                    else {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else {
                         return
                     }
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self = self else {
-                            return
-                        }
-                        self.imageURL = url
-                        self.objectWillChange.send()
-                    }
-                case .failure(let error):
-                    print(error)
-                    return
+                    self.imageURL = url
+                    self.objectWillChange.send()
                 }
+            case .failure(let error):
+                print(error)
+                return
             }
         }
     }
     
     private func updateFilled(){
-        if checkGenus() && wateringInterval != 0{
-            isAllFilled = true
-        } else {
-            isAllFilled = false
-        }
+        isAllFilled = (checkGenus() && wateringInterval != 0)
     }
     
     private func checkGenus() -> Bool{
