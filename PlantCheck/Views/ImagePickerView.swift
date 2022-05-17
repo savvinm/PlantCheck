@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ImagePikcerView: View{
-    @ObservedObject var vm: PlantAddingViewModel
+    @ObservedObject var vm: PlantAddingController
     
     var body: some View{
         VStack{

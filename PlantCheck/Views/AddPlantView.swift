@@ -12,7 +12,7 @@ struct AddPlantView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 
     @FocusState var genusFieldIsFocused: Bool
-    @ObservedObject var vm = PlantAddingViewModel()
+    @ObservedObject var vm = PlantAddingController()
     @State var isSaving = false
     @State var isShowingAllert = false
     

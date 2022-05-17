@@ -14,7 +14,7 @@ extension Plant{
         case imagesDeletingError
     }
     
-    var _wateringIvents: [String]{
+    var wateringIvents_: [String]{
         guard let ivents = wateringIvents as? Set<WateringIvent> else {
             return []
         }
@@ -31,7 +31,7 @@ extension Plant{
         return res.reversed()
     }
     
-    var _nextWatering: String{
+    var nextWatering_: String{
         guard let nextWatering = nextWatering else {
             return ""
         }
@@ -46,17 +46,6 @@ extension Plant{
         dateFormatter.dateFormat = "EEEE, MMMM d"
         return dateFormatter.string(from: nextWatering)
     }
-    
-    /*var isWateringDateToday: Bool{
-        guard let nextWatering = nextWatering else {
-            return true
-        }
-        let calendar = Calendar.current
-        if calendar.isDateInToday(nextWatering){
-            return true
-        }
-        return false
-    }*/
     
     var hasWateringIvents: Bool{
         if let ivents = wateringIvents as? Set<WateringIvent>{

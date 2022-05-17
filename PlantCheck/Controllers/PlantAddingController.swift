@@ -1,5 +1,5 @@
 //
-//  PlantAddingViewModel.swift
+//  PlantAddingController.swift
 //  PlantCheck
 //
 //  Created by Maksim Savvin on 03.05.2022.
@@ -8,7 +8,7 @@
 import CoreData
 import SwiftUI
 
-class PlantAddingViewModel: ObservableObject{
+class PlantAddingController: ObservableObject{
     
     private(set) var wateringIntervals = [1 : "Everyday", 2 : "Every 2 days", 3 : "Every 3 days", 7 : "Every week", 14: "Every two weeks", 30 : "Every month"]
     var intervals: [Int]{
@@ -52,16 +52,18 @@ class PlantAddingViewModel: ObservableObject{
     @Published var genusIsFocused = false
 
     private let api: APIService
-    private let parser: WikiParser
-    private let fsm: FileSystemManager
+    private let wikiParser: WikiParser
+    private let fileSystemManager: FileSystemManager
+    private let coreDataController: CoreDataController
     
     init(){
         genuses = []
         options = []
         thumbnails = [:]
-        parser = WikiParser()
+        wikiParser = WikiParser()
         api = APIService()
-        fsm = FileSystemManager()
+        fileSystemManager = FileSystemManager()
+        coreDataController = CoreDataController()
         start()
     }
     
@@ -72,13 +74,12 @@ class PlantAddingViewModel: ObservableObject{
             }
             switch result {
             case .success(let query):
-                self.genuses = self.parser.parseListOfPlants(from: query)
+                self.genuses = self.wikiParser.parseListOfPlants(from: query)
             case .failure(let error):
                 print(error)
             }
         }
     }
-    
     
     private func updateImages(){
         guard imageCount != 0 else {
@@ -188,15 +189,8 @@ class PlantAddingViewModel: ObservableObject{
     }
     
     func savePlant(viewContext: NSManagedObjectContext) throws {
-        let id = UUID()
-        let newPlant = Plant(context: viewContext)
-        newPlant.id = id
-        newPlant.name = name == "" ? nil : name
-        newPlant.genus = genus
-        newPlant.wateringInterval = Int16(wateringInterval)
-        newPlant.stringWateringInterval = wateringIntervals[wateringInterval]
-        newPlant.location = location == "" ?  nil : location
-        newPlant.creationDate = Date()
+        var wikiDescription: String?
+        var wikiCultivation: String?
         
         let group = DispatchGroup()
         group.enter()
@@ -206,8 +200,8 @@ class PlantAddingViewModel: ObservableObject{
             }
             switch result{
             case.success(let query):
-                newPlant.wikiDescription = self.parser.parseDescription(from: query)
-                newPlant.wikiCultivation = self.parser.parseBlock(from: query, title: "Cultivation")
+                wikiDescription = self.wikiParser.parseDescription(from: query)
+                wikiCultivation = self.wikiParser.parseBlock(from: query, title: "Cultivation")
                 group.leave()
             case.failure(let error):
                 print(error)
@@ -215,12 +209,11 @@ class PlantAddingViewModel: ObservableObject{
         }
         var timeoutResult = group.wait(timeout: .now() + 2)
         if timeoutResult == .timedOut{
-            viewContext.delete(newPlant)
             throw SavingError.wikiDescriptionTimeout
         }
         
-        group.enter()
         if imageCount == 0 && imageURL != nil{
+            group.enter()
             api.downloadImage(from: imageURL!){ [weak self] result in
                 guard let self = self else {
                     return
@@ -228,52 +221,35 @@ class PlantAddingViewModel: ObservableObject{
                 switch result{
                 case.success(let image):
                     self.images.append(image)
-                    guard let paths = self.fsm.saveImages(images: self.images, plantId: id) else {
-                        print("Error saving images")
-                        return
-                    }
-                    newPlant.imagesPath = paths.joined(separator: "%20")
                     group.leave()
                 case.failure(let error):
                     print(error)
                 }
             }
-        } else {
-            if
-                imageCount > 0,
-                let paths = fsm.saveImages(images: images, plantId: id)
-            {
-                newPlant.imagesPath = paths.joined(separator: "%20")
-            }
-            group.leave()
         }
         
         timeoutResult = group.wait(timeout: .now() + 2)
         switch timeoutResult{
         case.success:
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
+            try coreDataController.savePlant(
+                context: viewContext,
+                fileSystemManager: fileSystemManager,
+                genus: genus,
+                name: name == "" ? nil : name,
+                wateringInterval: wateringInterval,
+                stringWateringInterval: wateringIntervals[wateringInterval]!,
+                location: location == "" ? nil : location,
+                wikiDescription: wikiDescription,
+                wikiCultivation: wikiCultivation,
+                images: images
+            )
         case.timedOut:
-            if newPlant.getImagesCount(with: fsm) > 0{
-                do{
-                    try newPlant.prepareForDeletion(context: viewContext, fsm: fsm)
-                } catch {
-                    print(error)
-                }
-            }
-            viewContext.delete(newPlant)
-            throw SavingError.savingImagesTmeout
+            throw SavingError.fetchingImageTmeout
         }
     }
 }
 
 enum SavingError: Error{
-    case savingImagesTmeout
+    case fetchingImageTmeout
     case wikiDescriptionTimeout
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct OptionsList: View{
-    @ObservedObject var vm: PlantAddingViewModel
+    @ObservedObject var vm: PlantAddingController
     @FocusState var genusFieldIsFocused: Bool
     
     var body: some View{

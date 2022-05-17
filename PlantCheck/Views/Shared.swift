@@ -84,7 +84,7 @@ struct InputStyle: ViewModifier{
 
 struct MenuPicker: View{
     @State var selection: Int
-    @ObservedObject var vm: PlantAddingViewModel
+    @ObservedObject var vm: PlantAddingController
     var body: some View{
         VStack{
             Menu{

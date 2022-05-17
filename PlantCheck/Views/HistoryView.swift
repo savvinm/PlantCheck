@@ -18,7 +18,7 @@ struct HistoryView: View {
                     Text("Watering history")
                         .padding(.bottom, 15)
                         .font(.headline)
-                        ForEach(plant._wateringIvents, id: \.self){ ivent in
+                        ForEach(plant.wateringIvents_, id: \.self){ ivent in
                             HStack{
                                 Text(ivent)
                                     .fontWeight(Font.Weight.medium)

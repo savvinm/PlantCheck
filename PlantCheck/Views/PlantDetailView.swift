@@ -100,7 +100,7 @@ struct PlantDetailView: View {
         VStack{
             plantSection(title: "Watering schedule", value: plant.stringWateringInterval ?? "", imageName: "calendar")
             VStack{
-                plantSection(title: "Next watering", value: plant._nextWatering, imageName: "calendar.badge.clock")
+                plantSection(title: "Next watering", value: plant.nextWatering_, imageName: "calendar.badge.clock")
                 if !plant.hasWateringIvents{
                     Text("Water your plant to update information")
                         .multilineTextAlignment(.center)
