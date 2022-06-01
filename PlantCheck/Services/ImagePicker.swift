@@ -12,7 +12,6 @@ struct ImagePicker: UIViewControllerRepresentable {
     @Binding var images: [UIImage]
     @Binding var imageCount: Int
     
-
     func makeUIViewController(context: Context) -> PHPickerViewController {
         var config = PHPickerConfiguration(photoLibrary: .shared())
         config.filter = .images
@@ -45,13 +44,13 @@ struct ImagePicker: UIViewControllerRepresentable {
             }
             parent.imageCount = results.count
             parent.images = []
-            for result in results{
+            for result in results {
                 guard result.itemProvider.canLoadObject(ofClass: UIImage.self) else {
                     print("Error getting image from picker")
                     continue
                 }
                 result.itemProvider.loadObject(ofClass: UIImage.self) { image, error in
-                    guard let image = image else{
+                    guard let image = image else {
                         print(error!)
                         return
                     }

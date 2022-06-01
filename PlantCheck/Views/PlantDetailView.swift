@@ -21,48 +21,40 @@ struct PlantDetailView: View {
     @State var isShowingWateringLog = false
     
     var body: some View {
-        GeometryReader{ geometry in
-            ScrollView{
+        GeometryReader { geometry in
+            ScrollView {
                 imageScroll(for: plant.getImages(with: fileSystemManager), in: geometry)
-                VStack{
-                    titleSection
-                    toolBar
-                        .frame(width: geometry.size.width * 0.9, height: geometry.size.height * 0.15)
-                    if plant.location != nil{
-                        VStack{
-                            plantSection(title: "Location", value: plant.location!, imageName: "location.fill")
-                        }
-                        .padding(.top)
-                    }
-                    wateringInfo
-                        .padding(.bottom, 30)
-                }
-                .padding(.top, 5)
-                .padding(.horizontal)
+                plantBody(in: geometry)
             }
             .ignoresSafeArea(edges: .top)
             .sheet(isPresented: $isShowingWateringLog, content: { HistoryView(plant: plant) })
             .sheet(isPresented: $isShowingDescription, content: { WikiDescriptionView(plant: plant) })
-            .overlay(alignment: .topTrailing){
-                if isInSheet{
-                    CloseButton(presentationMode: presentationMode, withBackground: true)
-                } else {
-                    HStack{
-                        backButton
-                        Spacer()
-                        deleteButton
-                    }
-                }
-            }
+            .overlay(alignment: .topTrailing) { pageOverlay }
             .navigationBarHidden(true)
             .modifier(ImageBackground(geometry: isInSheet ? geometry : nil))
         }
         .ignoresSafeArea(edges: .bottom)
     }
     
-    private func icon(title: String?, imageName: String) -> some View{
-        VStack{
-            VStack{
+    private func plantBody(in geometry: GeometryProxy) -> some View {
+        VStack {
+            titleSection
+            toolBar.frame(width: geometry.size.width * 0.9, height: geometry.size.height * 0.15)
+            if plant.location != nil {
+                VStack {
+                    infoSection(title: "Location", value: plant.location!, imageName: "location.fill")
+                }
+                .padding(.top)
+            }
+            wateringInfo.padding(.bottom, 30)
+        }
+        .padding(.top, 5)
+        .padding(.horizontal)
+    }
+    
+    private func icon(title: String?, imageName: String) -> some View {
+        VStack {
+            VStack {
                 Image(systemName: imageName)
                     .foregroundColor(.secondary)
                     .font(Font.system(size: 30))
@@ -77,31 +69,41 @@ struct PlantDetailView: View {
         }
     }
     
-    private var toolBar: some View{
-        GeometryReader{ geometry in
-            HStack{
-                Spacer()
-                Button(action: { waterPlant() }){
-                    icon(title: "Water", imageName: plant.canBeWatered ? "drop" : "drop.fill")
+    private var pageOverlay: some View {
+        VStack {
+            if isInSheet {
+                CloseButton(presentationMode: presentationMode, withBackground: true)
+            } else {
+                HStack {
+                    backButton
+                    Spacer()
+                    deleteButton
                 }
-                .padding()
-                .disabled(!plant.canBeWatered)
-                Button(action: { isShowingWateringLog = true }){
-                    icon(title: "History", imageName: plant.hasWateringIvents ? "archivebox.fill" : "archivebox")
-                }
-                .padding()
-                .disabled(!plant.hasWateringIvents)
-                Spacer()
             }
         }
     }
     
-    private var wateringInfo: some View{
-        VStack{
-            plantSection(title: "Watering schedule", value: plant.stringWateringInterval ?? "", imageName: "calendar")
-            VStack{
-                plantSection(title: "Next watering", value: plant.nextWatering_, imageName: "calendar.badge.clock")
-                if !plant.hasWateringIvents{
+    private var toolBar: some View {
+        HStack(alignment: .center) {
+            Button(action: { waterPlant() }, label: {
+                icon(title: "Water", imageName: plant.canBeWatered ? "drop" : "drop.fill")
+            })
+            .padding()
+            .disabled(!plant.canBeWatered)
+            Button(action: { isShowingWateringLog = true }, label: {
+                icon(title: "History", imageName: plant.hasWateringIvents ? "archivebox.fill" : "archivebox")
+            })
+            .padding()
+            .disabled(!plant.hasWateringIvents)
+        }
+    }
+    
+    private var wateringInfo: some View {
+        VStack {
+            infoSection(title: "Watering schedule", value: plant.stringWateringInterval ?? "", imageName: "calendar")
+            VStack {
+                infoSection(title: "Next watering", value: plant.nextWatering_, imageName: "calendar.badge.clock")
+                if !plant.hasWateringIvents {
                     Text("Water your plant to update information")
                         .multilineTextAlignment(.center)
                         .font(.footnote)
@@ -113,18 +115,17 @@ struct PlantDetailView: View {
         .padding(.top)
     }
     
-    
-    private func waterPlant(){
-        if plant.canBeWatered{
+    private func waterPlant() {
+        if plant.canBeWatered {
             coreDataController.water(plant, context: viewContext)
         }
     }
     
-    private func plantSection(title: String, value: String, imageName: String) -> some View{
-        HStack{
+    private func infoSection(title: String, value: String, imageName: String) -> some View {
+        HStack {
             icon(title: nil, imageName: imageName)
                 .padding(.trailing)
-            VStack(alignment: .leading){
+            VStack(alignment: .leading) {
                 Text(title)
                     .font(.headline)
                     .foregroundColor(.secondary)
@@ -135,27 +136,11 @@ struct PlantDetailView: View {
         }
     }
     
-    private var titleSection: some View{
-        HStack{
-            VStack(alignment: .leading){
-                HStack(alignment: .top){
-                    Text(plant.genus ?? "")
-                        .font(.title)
-                        .fontWeight(Font.Weight.semibold)
-                    if plant.wikiDescription != nil{
-                        Button(action: { isShowingDescription = true }){
-                            VStack{
-                                Image(systemName: "info.circle.fill")
-                                    .foregroundColor(.secondary)
-                                    .font(Font.system(size: 20))
-                            }
-                            .opacity(0.7)
-                            .padding(.leading, -5)
-                            .padding(.top, -5)
-                        }
-                    }
-                }
-                if plant.name != nil{
+    private var titleSection: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading) {
+                genusLabel
+                if plant.name != nil {
                     Text(plant.name!)
                         .font(.headline)
                         .fontWeight(Font.Weight.semibold)
@@ -165,24 +150,41 @@ struct PlantDetailView: View {
             Spacer()
         }
     }
+    
+    private var genusLabel: some View {
+        HStack(alignment: .top) {
+            Text(plant.genus ?? "")
+                .font(.title)
+                .fontWeight(Font.Weight.semibold)
+            if plant.wikiDescription != nil {
+                Button(action: { isShowingDescription = true }, label: {
+                    VStack {
+                        Image(systemName: "info.circle.fill")
+                            .foregroundColor(.secondary)
+                            .font(Font.system(size: 20))
+                    }
+                    .opacity(0.7)
+                    .padding(.leading, -5)
+                    .padding(.top, -5)
+                })
+            }
+        }
+    }
         
-    private func imageScroll(for images: [UIImage]?, in geometry: GeometryProxy) -> some View{
-        VStack{
-            if images != nil{
-                ScrollView(.horizontal, showsIndicators: false, content: {
-                    HStack{
-                        ForEach(images!, id : \.self){ img in
-                            VStack{
-                                Image(uiImage: img)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: geometry.size.width, height: geometry.size.height * 0.5)
-                                    .clipped()
-                                //scrollPosition(for: img, in: images!)
-                            }
+    private func imageScroll(for images: [UIImage]?, in geometry: GeometryProxy) -> some View {
+        VStack {
+            if images != nil {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    LazyHStack {
+                        ForEach(images!, id: \.self) { img in
+                            Image(uiImage: img)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: geometry.size.width, height: geometry.size.height * 0.5)
+                                .clipped()
                         }
                     }
-                })
+                }
             } else {
                 Image("default")
                     .resizable()
@@ -191,46 +193,17 @@ struct PlantDetailView: View {
         }
     }
     
-    private func scrollPosition(for img: UIImage, in images: [UIImage]) -> some View{
-        HStack(alignment: .center){
-            if images.count > 1 {
-                Text(String(images.firstIndex(of: img)! + 1) + " of " + String(images.count))
-            }
-        }
-        .foregroundColor(.secondary)
-        .font(.caption)
+    private var backButton: some View {
+        Button(action: { presentationMode.wrappedValue.dismiss() }, label: {
+            buttonLabel(imageName: "arrow.backward")
+        })
     }
     
-    
-    private var backButton: some View{
-        Button(action: { presentationMode.wrappedValue.dismiss() }){
-            ZStack(alignment: .center){
-                RoundedRectangle(cornerRadius: 10)
-                    .foregroundColor(.secondary)
-                    .frame(width: 35, height: 35)
-                    .opacity(0.6)
-                Image(systemName: "arrow.backward")
-                .foregroundColor(.white)
-                .font(Font.system(size: 20).bold())
-            }
-            .padding()
-        }
-    }
-    
-    private var deleteButton: some View{
-        Button(action: { isShowingAlert = true }){
-            ZStack(alignment: .center){
-                RoundedRectangle(cornerRadius: 10)
-                    .foregroundColor(.secondary)
-                    .frame(width: 35, height: 35)
-                    .opacity(0.6)
-                Image(systemName: "trash.fill")
-                    .foregroundColor(.white)
-                    .font(.system(size: 20).bold())
-            }
-            .padding()
-        }
-        .alert("Delete this plant?", isPresented: $isShowingAlert){
+    private var deleteButton: some View {
+        Button(action: { isShowingAlert = true }, label: {
+            buttonLabel(imageName: "trash.fill")
+        })
+        .alert("Delete this plant?", isPresented: $isShowingAlert) {
             Button("No", role: .cancel, action: {})
             Button("Yes", role: .destructive, action: {
                 deletePlant()
@@ -238,7 +211,20 @@ struct PlantDetailView: View {
         }
     }
     
-    private func deletePlant(){
+    private func buttonLabel(imageName: String) -> some View {
+        ZStack(alignment: .center) {
+            RoundedRectangle(cornerRadius: 10)
+                .foregroundColor(.secondary)
+                .frame(width: 35, height: 35)
+                .opacity(0.6)
+            Image(systemName: imageName)
+                .foregroundColor(.white)
+                .font(.system(size: 20).bold())
+        }
+        .padding()
+    }
+    
+    private func deletePlant() {
         do {
             try coreDataController.delete(plant, context: viewContext, fsm: fileSystemManager)
             presentationMode.wrappedValue.dismiss()
@@ -247,5 +233,3 @@ struct PlantDetailView: View {
         }
     }
 }
-
-

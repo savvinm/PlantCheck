@@ -7,20 +7,20 @@
 
 import SwiftUI
 
-final class FileSystemManager{
+final class FileSystemManager {
     
     private let baseURLs = FileManager.default.urls(for: .documentDirectory, in: FileManager.SearchPathDomainMask.userDomainMask)
     
-    func saveImages(images: [UIImage], plantId: UUID) -> [String]?{
+    func saveImages(images: [UIImage], plantId: UUID) -> [String]? {
         guard let baseURL = baseURLs.first else {
             print("Error getting file system root")
             return nil
         }
         var paths = [String]()
-        for index in 0..<images.count{
+        for index in 0..<images.count {
             let name = plantId.uuidString + ".\(index).jpg"
             let url = baseURL.appendingPathComponent(name)
-            do{
+            do {
                 try saveImageInFS(image: images[index], path: url)
                 paths.append(name)
             } catch {
@@ -34,21 +34,21 @@ final class FileSystemManager{
         guard let data = image.jpegData(compressionQuality: 0.4) else {
             throw FSError.imageCompressingError
         }
-        do{
+        do {
             try data.write(to: path)
-        } catch{
+        } catch {
             throw FSError.savingError
         }
     }
     
-    func readImage(imageName: String) -> UIImage?{
+    func readImage(imageName: String) -> UIImage? {
         guard let baseURL = baseURLs.first else {
             print("Error getting file system root")
             return nil
         }
         let url = baseURL.appendingPathComponent(imageName)
         if let data = FileManager.default.contents(atPath: url.path),
-           let image = UIImage(data: data){
+           let image = UIImage(data: data) {
             return image
         } else {
             print("Error reading image")
@@ -61,7 +61,7 @@ final class FileSystemManager{
             throw FSError.invalidSystemRoot
         }
         let url = baseURL.appendingPathComponent(fileName)
-        do{
+        do {
             try FileManager.default.removeItem(atPath: url.path)
         } catch {
             throw FSError.deletingError
@@ -69,7 +69,7 @@ final class FileSystemManager{
     }
 }
 
-enum FSError: Error{
+enum FSError: Error {
     case invalidSystemRoot
     case readingError
     case savingError

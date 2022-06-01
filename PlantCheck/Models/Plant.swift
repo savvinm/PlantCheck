@@ -5,41 +5,40 @@
 //  Created by Maksim Savvin on 05.05.2022.
 //
 
-
 import CoreData
 import SwiftUI
 
-extension Plant{
-    enum PlantError: Error{
+extension Plant {
+    enum PlantError: Error {
         case imagesDeletingError
     }
     
-    var wateringIvents_: [String]{
+    var wateringIvents_: [String] {
         guard let ivents = wateringIvents as? Set<WateringIvent> else {
             return []
         }
         var dates = [Date]()
-        for ivent in ivents{
+        for ivent in ivents {
             dates.append(ivent.date!)
         }
         var res = [String]()
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "d MMMM yyyy, HH:mm:ss"
-        for date in dates.sorted(){
+        for date in dates.sorted() {
             res.append(dateFormatter.string(from: date))
         }
         return res.reversed()
     }
     
-    var nextWatering_: String{
+    var nextWatering_: String {
         guard let nextWatering = nextWatering else {
             return ""
         }
         let calendar = Calendar.current
-        if calendar.isDateInToday(nextWatering){
+        if calendar.isDateInToday(nextWatering) {
             return "Today"
         }
-        if calendar.isDateInTomorrow(nextWatering){
+        if calendar.isDateInTomorrow(nextWatering) {
             return "Tommorow"
         }
         let dateFormatter = DateFormatter()
@@ -47,54 +46,54 @@ extension Plant{
         return dateFormatter.string(from: nextWatering)
     }
     
-    var hasWateringIvents: Bool{
+    var hasWateringIvents: Bool {
         if let ivents = wateringIvents as? Set<WateringIvent>{
-            if ivents.count > 0{
+            if ivents.count > 0 {
                 return true
             }
         }
         return false
     }
     
-    var canBeWatered: Bool{
+    var canBeWatered: Bool {
         guard let lastWatering = lastWatering else {
             return true
         }
         let calendar = Calendar.current
-        if calendar.isDateInToday(lastWatering){
+        if calendar.isDateInToday(lastWatering) {
             return false
         }
         return true
     }
     
-    func water(){
+    func water() {
         lastWatering = Date()
         nextWatering = Date() + Double(wateringInterval) * 86400
         objectWillChange.send()
     }
     
-    func getImages(with fsm: FileSystemManager) -> [UIImage]?{
+    func getImages(with fsm: FileSystemManager) -> [UIImage]? {
         guard let paths = imagesPath?.components(separatedBy: "%20") else {
             return nil
         }
         var images = [UIImage]()
         for path in paths {
-            if let image = fsm.readImage(imageName: path){
+            if let image = fsm.readImage(imageName: path) {
                 images.append(image)
             }
         }
         return images
     }
     
-    func getThumbnail(with fsm: FileSystemManager) -> UIImage?{
-        if let paths = imagesPath?.components(separatedBy: "%20"){
+    func getThumbnail(with fsm: FileSystemManager) -> UIImage? {
+        if let paths = imagesPath?.components(separatedBy: "%20") {
             return fsm.readImage(imageName: paths.first!)
         }
         return nil
     }
     
-    func getImagesCount(with fsm: FileSystemManager) -> Int{
-        if let paths = imagesPath?.components(separatedBy: "%20"){
+    func getImagesCount(with fsm: FileSystemManager) -> Int {
+        if let paths = imagesPath?.components(separatedBy: "%20") {
             return paths.count
         }
         return 0
@@ -105,9 +104,9 @@ extension Plant{
         try deleteImagesFromStorage(with: fsm)
     }
     
-    private func deleteWateringIvents(context: NSManagedObjectContext){
-        if let ivents = wateringIvents as? Set<WateringIvent>{
-            for ivent in ivents{
+    private func deleteWateringIvents(context: NSManagedObjectContext) {
+        if let ivents = wateringIvents as? Set<WateringIvent> {
+            for ivent in ivents {
                 context.delete(ivent)
             }
         }
@@ -119,34 +118,34 @@ extension Plant{
         }
         var newPaths = [String]()
         for path in paths {
-            do{
+            do {
                 try fsm.deleteFile(fileName: path)
             } catch {
                 print(error)
                 newPaths.append(path)
             }
         }
-        if !newPaths.isEmpty{
+        if !newPaths.isEmpty {
             imagesPath = newPaths.joined(separator: "%20")
             throw PlantError.imagesDeletingError
         }
     }
     
-    func getCultivationPair() -> (dictionary: [String: String], titles: [String])?{
+    func getCultivationPair() -> (dictionary: [String: String], titles: [String])? {
         guard let cultivation = wikiCultivation else {
             return nil
         }
         return parseParagraph(cultivation)
     }
     
-    private func parseParagraph(_ text: String) -> ([String: String], [String]){
+    private func parseParagraph(_ text: String) -> ([String: String], [String]) {
         var titles = [String]()
         var res = [String: String]()
         let clearText = text.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "\n\n\n\n", with: "\n\n")
         let parts = clearText.components(separatedBy: "\n")
         var title = "body"
         var tmp = ""
-        for index in parts.indices{
+        for index in parts.indices {
             if parts[index].first == "=" && parts[index].last == "="{
                 if tmp != "" && tmp != "\n"{
                     res[title] = tmp.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -165,4 +164,3 @@ extension Plant{
         return (res, titles)
     }
 }
-

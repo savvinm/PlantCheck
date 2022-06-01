@@ -7,9 +7,9 @@
 
 import Foundation
 
-final class WikiParser{
+final class WikiParser {
     
-    func parseListOfPlants(from query: WikiPageRevisionModel) -> [String]{
+    func parseListOfPlants(from query: WikiPageRevisionModel) -> [String] {
         var parts = query.query.pages.first!.revisions.first!.slots.main.content.components(separatedBy: "==List of common houseplants==")
         guard let tail = parts.last else {
             print("Wrong page format: expected 'List of common houseplants'")
@@ -22,25 +22,24 @@ final class WikiParser{
         }
         parts = body.components(separatedBy: "\n")
         var plants =  [String]()
-        for part in parts{
-            if let plant = parsePlant(from: part){
+        for part in parts {
+            if let plant = parsePlant(from: part) {
                     plants.append(plant.trimmingCharacters(in: .whitespacesAndNewlines))
                 }
             }
         return plants
     }
     
-    func parseBlock(from query: WikiPageRevisionModel, title: String) -> String?{
-        if let text = query.query.pages.first?.revisions.first?.slots.main.content{
-            if let description = getParagraph(in: text, title: title){
+    func parseBlock(from query: WikiPageRevisionModel, title: String) -> String? {
+        if let text = query.query.pages.first?.revisions.first?.slots.main.content {
+            if let description = getParagraph(in: text, title: title) {
                 return clearParagraph(paragraph: description)
             }
         }
         return nil
     }
     
-    
-    func parseDescription(from query: WikiPageRevisionModel) -> String?{
+    func parseDescription(from query: WikiPageRevisionModel) -> String? {
         guard
             let text = query.query.pages.first?.revisions.first?.slots.main.content,
             let title = query.query.pages.first?.title
@@ -63,7 +62,7 @@ final class WikiParser{
         
     }
     
-    private func getParagraph(in text: String, title: String) -> String?{
+    private func getParagraph(in text: String, title: String) -> String? {
         guard text.contains(title) else {
             return nil
         }
@@ -75,9 +74,9 @@ final class WikiParser{
         var parts = parts1.count == 2 ? parts1 : parts2
         var res = ""
         parts = parts[1].components(separatedBy: "==")
-        if parts.count > 1{
+        if parts.count > 1 {
             res += parts[1]
-            for index in 2..<parts.count{
+            for index in 2..<parts.count {
                 if parts[index].first == "="{
                     res += parts[index]
                 } else {
@@ -88,7 +87,7 @@ final class WikiParser{
         return nil
     }
     
-    private func clearParagraph(paragraph: String) -> String{
+    private func clearParagraph(paragraph: String) -> String {
         var res = paragraph.replacingOccurrences(of: "\'\'", with: "")
         res = res.replacingOccurrences(of: "\"", with: "")
         res = res.replacingOccurrences(of: "\'", with: "")
@@ -99,7 +98,7 @@ final class WikiParser{
         return res
     }
     
-    private func removeFirstTranscription(text: String) -> String{
+    private func removeFirstTranscription(text: String) -> String {
         let stringArray = Array(text)
         guard
             let startIndex = stringArray.firstIndex(of: "("),
@@ -114,12 +113,12 @@ final class WikiParser{
         return res
     }
     
-    private func handleConvertions(text: String) -> String{
+    private func handleConvertions(text: String) -> String {
         var res = ""
         let parts = text.components(separatedBy: "{{")
-        for part in parts{
+        for part in parts {
             let smallParts = part.components(separatedBy: "}}")
-            if smallParts.count == 1{
+            if smallParts.count == 1 {
                 res += smallParts.first!
             } else {
                 res += handleConvertion(convertion: smallParts[0])
@@ -129,9 +128,9 @@ final class WikiParser{
         return res
     }
     
-    private func handleConvertion(convertion: String) -> String{
+    private func handleConvertion(convertion: String) -> String {
         let parts = convertion.components(separatedBy: "|")
-        if parts.count < 3{
+        if parts.count < 3 {
             return ""
         }
         if parts.first?.lowercased() != "convert"{
@@ -146,19 +145,19 @@ final class WikiParser{
         return "\(parts[1]) \(parts[2])"
     }
     
-    private func handleLinks(text: String) -> String{
+    private func handleLinks(text: String) -> String {
         let stringArray = Array(text)
         var res = ""
         var openBracetCount = 0
         var closeBracetCount = 0
         var lastSlashIndex: Int?
-        for index in stringArray.indices{
+        for index in stringArray.indices {
             if stringArray[index] == "/"{
                 lastSlashIndex = index
             }
             if stringArray[index] == "<"{
                 openBracetCount += 1
-                if openBracetCount == 1{
+                if openBracetCount == 1 {
                     res += stringArray[0..<index]
                 }
             }
@@ -174,13 +173,13 @@ final class WikiParser{
                 }
             }
         }
-        if openBracetCount == closeBracetCount && openBracetCount == 0{
+        if openBracetCount == closeBracetCount && openBracetCount == 0 {
             res += text
         }
         return res
     }
     
-    private func handleLinkOrFile(text: String) -> String{
+    private func handleLinkOrFile(text: String) -> String {
         guard
             !text.contains("File:"),
             !text.contains("Image:")
@@ -189,25 +188,24 @@ final class WikiParser{
         }
         let tmp = text.replacingOccurrences(of: "[", with: "").replacingOccurrences(of: "]", with: "")
         let parts = tmp.components(separatedBy: "|")
-        if parts.count == 2{
+        if parts.count == 2 {
             return parts[1]
         } else {
             return parts.first!
         }
     }
     
-    
-    private func handleHyperLinksAndFiles(text: String) -> String{
+    private func handleHyperLinksAndFiles(text: String) -> String {
         let stringArray = Array(text)
         var res = ""
         var openBracetCount = 0
         var closeBracetCount = 0
         var openIndex = 0
         var closeIndex = 0
-        for index in stringArray.indices{
+        for index in stringArray.indices {
             if stringArray[index] == "["{
                 openBracetCount += 1
-                if openBracetCount == 1{
+                if openBracetCount == 1 {
                     openIndex = index
                     res += stringArray[0..<index]
                 }
@@ -217,23 +215,22 @@ final class WikiParser{
                 if closeBracetCount == openBracetCount {
                     closeIndex = index
                     res += handleLinkOrFile(text: String(stringArray[openIndex...closeIndex]))
-                    if index + 1 < stringArray.endIndex{
+                    if index + 1 < stringArray.endIndex {
                         res += handleHyperLinksAndFiles(text: String(stringArray[index + 1..<stringArray.endIndex]))
                         break
                     }
                 }
             }
         }
-        if openBracetCount == closeBracetCount && openBracetCount == 0{
+        if openBracetCount == closeBracetCount && openBracetCount == 0 {
             res += text
         }
         return res
     }
     
-    
-    private func parsePlant(from plantString: String) -> String?{
-        if plantString.starts(with: "*") && !plantString.starts(with: "**"){
-            if let plant = plantString.slice(from: "[[", to: "]]"){
+    private func parsePlant(from plantString: String) -> String? {
+        if plantString.starts(with: "*") && !plantString.starts(with: "**") {
+            if let plant = plantString.slice(from: "[[", to: "]]") {
                 return plant.components(separatedBy: "(").first?.components(separatedBy: "|").first
             }
         }
@@ -242,7 +239,6 @@ final class WikiParser{
 }
 
 extension String {
-     
     func slice(from: String, to: String) -> String? {
         guard let rangeFrom = range(of: from)?.upperBound else {
             return nil
@@ -252,5 +248,4 @@ extension String {
         }
         return String(self[rangeFrom..<rangeTo])
     }
-     
 }

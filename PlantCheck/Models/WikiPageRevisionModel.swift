@@ -7,29 +7,29 @@
 
 import Foundation
 
-struct WikiPageRevisionModel: Codable{
+struct WikiPageRevisionModel: Codable {
     
     let batchcomplete: Bool
     let query: WikiQuery
     
-    struct WikiQuery: Codable{
+    struct WikiQuery: Codable {
         let pages: [WikiPage]
     }
     
-    struct WikiPage: Codable{
+    struct WikiPage: Codable {
         let pageid: Int
         let title: String
         let revisions: [WikiRevision]
     }
-    struct WikiRevision: Codable{
+    struct WikiRevision: Codable {
         let slots: WikiSlot
     }
     
-    struct WikiSlot: Codable{
+    struct WikiSlot: Codable {
         let main: WikiMain
     }
     
-    struct WikiMain: Codable{
+    struct WikiMain: Codable {
         let content: String
     }
 }

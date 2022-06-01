@@ -15,7 +15,7 @@ struct WikiImageModel: Codable{
         let pages: [WikiPage]
     }
     
-    struct WikiPage: Codable{
+    struct WikiPage: Codable {
         let pageid: Int
         let title: String
         let thumbnail: WikiImage?

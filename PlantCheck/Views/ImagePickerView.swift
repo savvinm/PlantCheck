@@ -7,39 +7,41 @@
 
 import SwiftUI
 
-struct ImagePikcerView: View{
+struct ImagePikcerView: View {
     @ObservedObject var vm: PlantAddingController
     
-    var body: some View{
-        VStack{
-            if vm.images.isEmpty{
-                if vm.imageURL == nil{
+    var body: some View {
+        VStack {
+            if vm.images.isEmpty {
+                if vm.imageURL == nil {
                     defaultImage.padding(.bottom)
                 } else {
                     wikiImage.padding(.bottom)
                 }
             } else {
-                ScrollView(.horizontal, showsIndicators: false){
-                    HStack{
-                        ForEach(vm.images, id : \.self){ img in
-                            VStack{
-                                inScrollImage(for: img)
-                                scrollPosition(for: img)
-                            }
-                        }
+                imagesScroll
+            }
+        }
+        .onTapGesture { vm.showingImagePicker.toggle() }
+        .sheet(isPresented: $vm.showingImagePicker) { ImagePicker(images: $vm.images, imageCount: $vm.imageCount) }
+    }
+    
+    private var imagesScroll: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack {
+                ForEach(vm.images, id: \.self) { img in
+                    VStack {
+                        inScrollImage(for: img)
+                        scrollPosition(for: img)
                     }
                 }
             }
         }
-        .onTapGesture {
-            vm.showingImagePicker.toggle()
-        }
-        .sheet(isPresented: $vm.showingImagePicker){ ImagePicker(images: $vm.images, imageCount: $vm.imageCount) }
     }
     
-    private func scrollPosition(for img: UIImage) -> some View{
-        HStack(alignment: .center){
-            if vm.imageCount <= 1{
+    private func scrollPosition(for img: UIImage) -> some View {
+        HStack(alignment: .center) {
+            if vm.imageCount <= 1 {
                 Text("1of1").opacity(0)
             } else {
                 Text(String(vm.images.firstIndex(of: img)! + 1) + " of " + String(vm.imageCount))
@@ -49,20 +51,19 @@ struct ImagePikcerView: View{
         .font(.caption)
     }
     
-    private func inScrollImage(for img: UIImage) -> some View{
-        ZStack{
-            Image(uiImage: img)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.35)
-                .clipped()
-            removeButton(for: img)
-        }
+    private func inScrollImage(for img: UIImage) -> some View {
+        Image(uiImage: img)
+            .resizable()
+            .aspectRatio(contentMode: .fill)
+            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.35)
+            .clipped()
+            .overlay(alignment: .bottomTrailing) {
+                removeButton(for: img).padding([.trailing, .bottom])
+            }
     }
     
-    
-    private func toolIcon(imageName: String) -> some View{
-        ZStack(alignment: .center){
+    private func toolIcon(imageName: String) -> some View {
+        ZStack(alignment: .center) {
             RoundedRectangle(cornerRadius: 10)
                 .foregroundColor(.white)
                 .frame(width: 45, height: 45)
@@ -74,56 +75,38 @@ struct ImagePikcerView: View{
         }
     }
     
-    private var wikiImage: some View{
-        ZStack{
-            AsyncImage(url: vm.imageURL!){ image in
-                image
-                    .resizable()
-                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.35)
-            } placeholder: {
-                ZStack{
-                    defaultImage
-                    ProgressView()
-                }
-            }
-            photoIcon
-        }
-    }
-    
-    private func removeButton(for img: UIImage) -> some View{
-        HStack{
-            Spacer()
-            VStack{
-                Spacer()
-                Button(action: {
-                    withAnimation(.easeInOut){
-                        vm.removeImage(img)
-                    }
-                }, label: {
-                    toolIcon(imageName: "trash.fill")
-                })
-                .padding([.trailing, .bottom])
-            }
-        }
-    }
-    
-    private var photoIcon: some View{
-        HStack{
-            Spacer()
-            VStack{
-                Spacer()
-                toolIcon(imageName: "photo")
-                    .padding([.trailing, .bottom])
-            }
-        }
-    }
-    
-    private var defaultImage: some View{
-        ZStack{
-            Image("default")
+    private var wikiImage: some View {
+        AsyncImage(url: vm.imageURL!) { image in
+            image
                 .resizable()
                 .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.35)
-            photoIcon
+        } placeholder: {
+            ZStack {
+                defaultImage
+                ProgressView()
+            }
         }
+        .overlay(alignment: .bottomTrailing) {
+            toolIcon(imageName: "photo").padding([.trailing, .bottom])
+        }
+    }
+    
+    private func removeButton(for img: UIImage) -> some View {
+        Button(action: {
+            withAnimation(.easeInOut) {
+                vm.removeImage(img)
+            }
+        }, label: {
+            toolIcon(imageName: "trash.fill")
+        })
+    }
+    
+    private var defaultImage: some View {
+        Image("default")
+            .resizable()
+            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.35)
+            .overlay(alignment: .bottomTrailing) {
+                toolIcon(imageName: "photo").padding([.trailing, .bottom])
+            }
     }
 }

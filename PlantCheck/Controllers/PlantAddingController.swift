@@ -8,14 +8,14 @@
 import CoreData
 import SwiftUI
 
-class PlantAddingController: ObservableObject{
+class PlantAddingController: ObservableObject {
     
-    private(set) var wateringIntervals = [1 : "Everyday", 2 : "Every 2 days", 3 : "Every 3 days", 7 : "Every week", 14: "Every two weeks", 30 : "Every month"]
+    private(set) var wateringIntervals = [1: "Everyday", 2: "Every 2 days", 3: "Every 3 days", 7: "Every week", 14: "Every two weeks", 30: "Every month"]
     var intervals: [Int]{
         wateringIntervals.keys.sorted().reversed()
     }
-    private var genuses: [String]{
-        didSet{
+    private var genuses: [String] {
+        didSet {
             fetchThumbnails(withLimit: 45, for: genuses)
         }
     }
@@ -27,13 +27,13 @@ class PlantAddingController: ObservableObject{
     @Published var showingImagePicker = false
     
     @Published var imageCount: Int = 0
-    var images: [UIImage] = []{
-        didSet{
+    var images: [UIImage] = [] {
+        didSet {
             updateImages()
         }
     }
     var genus = "" {
-        didSet{
+        didSet {
             if genus != oldValue{
                 updateWikiImage()
                 updateOptions()
@@ -56,7 +56,7 @@ class PlantAddingController: ObservableObject{
     private let fileSystemManager: FileSystemManager
     private let coreDataController: CoreDataController
     
-    init(){
+    init() {
         genuses = []
         options = []
         thumbnails = [:]
@@ -67,8 +67,8 @@ class PlantAddingController: ObservableObject{
         start()
     }
     
-    private func start(){
-        api.fetchPageFromWiki(pageTitle: "Houseplant"){ [weak self] result in
+    private func start() {
+        api.fetchPageFromWiki(pageTitle: "Houseplant") { [weak self] result in
             guard let self = self else {
                 return
             }
@@ -91,7 +91,7 @@ class PlantAddingController: ObservableObject{
         }
     }
     
-    private func updateWikiImage(){
+    private func updateWikiImage() {
         imageURL = nil
         guard imageCount == 0 && checkGenus() else {
             return
@@ -124,26 +124,26 @@ class PlantAddingController: ObservableObject{
         }
     }
     
-    private func updateFilled(){
+    private func updateFilled() {
         isAllFilled = (checkGenus() && wateringInterval != 0)
     }
     
-    private func checkGenus() -> Bool{
+    private func checkGenus() -> Bool {
         genuses.contains(genus.trimmingCharacters(in: .whitespacesAndNewlines))
     }
     
-    func removeImage(_ image: UIImage){
-        if let index = images.firstIndex(of: image){
+    func removeImage(_ image: UIImage) {
+        if let index = images.firstIndex(of: image) {
             imageCount -= 1
             images.remove(at: index)
         }
     }
     
-    private func fetchThumbnails(withLimit limit: Int, for titles: [String]){
-        if titles.count > limit{
+    private func fetchThumbnails(withLimit limit: Int, for titles: [String]) {
+        if titles.count > limit {
             fetchThumbnails(withLimit: limit, for: Array(titles.suffix(titles.count - limit)))
         }
-        api.fetchImagesFromWiki(pageTitles: Array(titles.prefix(limit)) , pithumbsize: 100){ [weak self] result in
+        api.fetchImagesFromWiki(pageTitles: Array(titles.prefix(limit)), pithumbsize: 100){ [weak self] result in
             switch result{
             case .success(let query):
                 for item in query.query.pages{
@@ -162,7 +162,7 @@ class PlantAddingController: ObservableObject{
         }
     }
     
-    private func updateOptions(){
+    private func updateOptions() {
         objectWillChange.send()
         options = []
         guard genus != "" else {
@@ -173,9 +173,9 @@ class PlantAddingController: ObservableObject{
         var res = [String]()
         for option in genuses{
             let clearGenus = genus.trimmingCharacters(in: .whitespacesAndNewlines)
-            if option.lowercased().starts(with: clearGenus.lowercased()){
+            if option.lowercased().starts(with: clearGenus.lowercased()) {
                 highPriority.append(option)
-            } else if option.lowercased().contains(clearGenus.lowercased()){
+            } else if option.lowercased().contains(clearGenus.lowercased()) {
                 lowPriority.append(option)
             }
         }
@@ -191,11 +191,11 @@ class PlantAddingController: ObservableObject{
         
         let group = DispatchGroup()
         group.enter()
-        api.fetchPageFromWiki(pageTitle: genus){ [weak self] result in
+        api.fetchPageFromWiki(pageTitle: genus) { [weak self] result in
             guard let self = self else {
                 return
             }
-            switch result{
+            switch result {
             case.success(let query):
                 wikiDescription = self.wikiParser.parseDescription(from: query)
                 wikiCultivation = self.wikiParser.parseBlock(from: query, title: "Cultivation")
@@ -205,17 +205,17 @@ class PlantAddingController: ObservableObject{
             }
         }
         var timeoutResult = group.wait(timeout: .now() + 2)
-        if timeoutResult == .timedOut{
+        if timeoutResult == .timedOut {
             throw SavingError.wikiDescriptionTimeout
         }
         
-        if imageCount == 0 && imageURL != nil{
+        if imageCount == 0 && imageURL != nil {
             group.enter()
-            api.downloadImage(from: imageURL!){ [weak self] result in
+            api.downloadImage(from: imageURL!) { [weak self] result in
                 guard let self = self else {
                     return
                 }
-                switch result{
+                switch result {
                 case.success(let image):
                     self.images.append(image)
                     group.leave()
@@ -226,7 +226,7 @@ class PlantAddingController: ObservableObject{
         }
         
         timeoutResult = group.wait(timeout: .now() + 2)
-        switch timeoutResult{
+        switch timeoutResult {
         case.success:
             try coreDataController.savePlant(
                 context: viewContext,
@@ -246,7 +246,7 @@ class PlantAddingController: ObservableObject{
     }
 }
 
-enum SavingError: Error{
+enum SavingError: Error {
     case fetchingImageTmeout
     case wikiDescriptionTimeout
 }

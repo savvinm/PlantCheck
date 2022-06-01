@@ -7,11 +7,10 @@
 
 import SwiftUI
 
-class APIService{
+class APIService {
     @Published var status: Bool = false
    
-    
-    func fetchPageFromWiki(pageTitle: String, completion: @escaping (Result<WikiPageRevisionModel,APIError>) -> Void) {
+    func fetchPageFromWiki(pageTitle: String, completion: @escaping (Result<WikiPageRevisionModel, APIError>) -> Void) {
         var urlComponents = URLComponents(string: "https://en.wikipedia.org/w/api.php?")!
         urlComponents.queryItems = [
         "action": "query",
@@ -51,15 +50,15 @@ class APIService{
         .resume()
     }
     
-    func fetchImagesFromWiki(pageTitles: [String], pithumbsize: Int? = nil, completion: @escaping (Result<WikiImageModel,APIError>) -> Void) {
+    func fetchImagesFromWiki(pageTitles: [String], pithumbsize: Int? = nil, completion: @escaping (Result<WikiImageModel, APIError>) -> Void) {
         var tail = "&titles="
-        for index in 0..<pageTitles.count{
+        for index in 0..<pageTitles.count {
             tail += pageTitles[index].replacingOccurrences(of: " ", with: "%20")
-            if index < pageTitles.count-1{
+            if index < pageTitles.count-1 {
                 tail += "%7C"
             }
         }
-        if let size = pithumbsize{
+        if let size = pithumbsize {
             tail += "&pithumbsize=" + String(size)
         } else {
             tail += "&piprop=original"
@@ -72,7 +71,7 @@ class APIService{
         "format": "json"].map { URLQueryItem(name: $0.key, value: $0.value) }
         let urlString = urlComponents.url!.absoluteString + tail
 
-        guard let url = URL(string: urlString) else{
+        guard let url = URL(string: urlString) else {
             completion(.failure(.invalidURL))
             return
         }
@@ -105,8 +104,7 @@ class APIService{
         .resume()
     }
     
-    
-    func downloadImage(from url: URL, completion: @escaping (Result<UIImage,APIError>) -> Void) {
+    func downloadImage(from url: URL, completion: @escaping (Result<UIImage, APIError>) -> Void) {
         URLSession.shared.dataTask(with: url) { data, response, error in
             guard
                 let httpResponse = response as? HTTPURLResponse,
@@ -132,9 +130,6 @@ class APIService{
         .resume()
     }
 }
-
-
-
 
 enum APIError: Error {
     case invalidURL

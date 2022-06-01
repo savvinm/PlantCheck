@@ -8,9 +8,8 @@
 import CoreData
 import SwiftUI
 
-class CoreDataController{
+class CoreDataController {
     var selectedPlant: Plant?
-    
     
     func savePlant(context: NSManagedObjectContext, fileSystemManager: FileSystemManager, genus: String, name: String?, wateringInterval: Int, stringWateringInterval: String, location: String?, wikiDescription: String?, wikiCultivation: String?, images: [UIImage]) throws {
         let id = UUID()
@@ -30,7 +29,7 @@ class CoreDataController{
         {
             newPlant.imagesPath = paths.joined(separator: "%20")
         }
-        do{
+        do {
             try context.save()
         } catch {
             let nsError = error as NSError
@@ -41,7 +40,7 @@ class CoreDataController{
     func delete(_ plant: Plant, context: NSManagedObjectContext, fsm: FileSystemManager) throws {
         try plant.prepareForDeletion(context: context, fsm: fsm)
         context.delete(plant)
-        do{
+        do {
             try context.save()
         } catch {
             let nsError = error as NSError
@@ -49,12 +48,12 @@ class CoreDataController{
         }
     }
     
-    func water(_ plant: Plant, context: NSManagedObjectContext){
+    func water(_ plant: Plant, context: NSManagedObjectContext) {
         let wateringIvent = WateringIvent(context: context)
         wateringIvent.plant = plant
         wateringIvent.date = Date()
         plant.water()
-        do{
+        do {
             try context.save()
         } catch {
             let nsError = error as NSError
@@ -62,28 +61,27 @@ class CoreDataController{
         }
     }
     
-    func getPlantsForWateringScroll(context: NSManagedObjectContext) -> (toWater: [Plant], watered: [Plant]){
+    func getPlantsForWateringScroll(context: NSManagedObjectContext) -> (toWater: [Plant], watered: [Plant]) {
         let request = NSFetchRequest<Plant>(entityName: "Plant")
         request.sortDescriptors = [NSSortDescriptor(keyPath: \Plant.genus, ascending: true), NSSortDescriptor(keyPath: \Plant.name, ascending: true)]
         let plants = (try? context.fetch(request)) ?? []
         var watered = [Plant]()
         var toWater = [Plant]()
         let calendar = Calendar.current
-        for plant in plants{
-            if let nextWatering = plant.nextWatering{
-                if nextWatering < Date() || calendar.isDateInToday(nextWatering){
+        for plant in plants {
+            if let nextWatering = plant.nextWatering {
+                if nextWatering < Date() || calendar.isDateInToday(nextWatering) {
                     toWater.append(plant)
                 }
             } else {
                 toWater.append(plant)
             }
-            if let lastWatering = plant.lastWatering{
-                if calendar.isDateInToday(lastWatering){
+            if let lastWatering = plant.lastWatering {
+                if calendar.isDateInToday(lastWatering) {
                     watered.append(plant)
                 }
             }
         }
         return (toWater, watered)
     }
-    
 }
